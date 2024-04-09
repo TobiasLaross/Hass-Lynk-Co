@@ -1,0 +1,69 @@
+refresh_tokens:
+  name: Refresh tokens
+  description: Refresh the ccc and refresh tokens.
+
+start_climate:
+  name: Start Climate
+  description: Starts the pre heating at the specified level.
+  fields:
+    duration_in_minutes:
+      description: "Maximum time to run pre climate"
+      required: false
+      example: 15
+      selector:
+        number:
+          min: 1
+          max: 30
+          mode: box
+    climate_level:
+      description: "Desired level of climate control."
+      required: false
+      example: "MEDIUM"
+      selector:
+        select:
+          options:
+            - "LOW"
+            - "MEDIUM"
+            - "HIGH"
+
+stop_climate:
+  name: Stop Climate
+  description: Stops the pre heating 
+
+lock_doors:
+  name: Lock doors
+  description: Lock all the vehicle doors and trunk.
+
+unlock_doors:
+  name: Unlock doors
+  description: Unlock all the vehicle doors and trunk.
+
+manual_update_data:
+  name: Manually update data
+  description: Update data on demand
+
+start_flash_lights:
+  name: Start Flash Lights
+  description: Starts the turn signals of the car
+
+stop_flash_lights:
+  name: Stop Flash Lights
+  description: Stops the turn signals of the car
+
+start_engine:
+  name: Start engine
+  description: Starts the engine, this is an undocumented feature, see README for details
+  fields:
+    duration_in_minutes:
+      description: "Maximum time to run engine"
+      required: false
+      example: 15
+      selector:
+        number:
+          min: 1
+          max: 15
+          mode: box
+
+stop_engine:
+  name: Stop engine
+  description: Stops the engine if started from start engine service, this is an undocumented feature, see README for details

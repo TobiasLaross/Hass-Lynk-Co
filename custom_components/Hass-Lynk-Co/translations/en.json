@@ -1,0 +1,42 @@
+{
+  "title": "Lynk & Co",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configure Lynk & Co Integration",
+        "description": "Please enter your credentials.",
+        "data": {
+          "email": "Email Address",
+          "password": "Password",
+          "vin": "Vehicle Identification Number (VIN)"
+        }
+      },
+      "two_factor": {
+        "title": "2FA Verification",
+        "description": "Enter the 2FA code.",
+        "data": {
+          "2fa": "Two-Factor Authentication Code"
+        }
+      }
+    },
+    "error": {
+      "invalid_email": "The provided email is invalid. Please check and try again.",
+      "invalid_vin": "The provided VIN is invalid. Please check and try again.",
+      "invalid_2fa_code": "The provided 2FA code is invalid. Please check and try again."
+    },
+    "abort": {
+      "unexpected_error": "An unexpected error occurred."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Lynk & Co Integration Settings",
+        "description": "Configure your Lynk & Co integration settings.",
+        "data": {
+          "experimental": "Experimental features (Not supported, see README)"
+        }
+      }
+    }
+  }
+}
