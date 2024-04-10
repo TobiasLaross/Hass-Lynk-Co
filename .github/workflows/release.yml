@@ -1,0 +1,27 @@
+name: Release on Version Change
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'manifest.json'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Extract version from manifest.json
+      id: version
+      run: echo "::set-output name=VERSION::$(jq -r .version manifest.json)"
+      shell: bash
+    - name: Create Release
+      uses: marvinpinto/action-automatic-releases@latest
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "${{ steps.version.outputs.VERSION }}"
+        title: "Release ${{ steps.version.outputs.VERSION }}"
+        files: |
+          path/to/your-component.zip
+        prerelease: false
