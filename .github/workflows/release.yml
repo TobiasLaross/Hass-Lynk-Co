@@ -12,11 +12,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Generate GitHub App token
+        uses: actions/create-github-app-token@v1
         id: app-token
-        uses: tibdex/create-github-app-token@v1
         with:
-          app_id: ${{ secrets.HASSLYNKCORELEASEBOTID }}
-          private_key: ${{ secrets.HASSLYNKCORELEASEBOTPRIVATEKEY }}
+          app-id: ${{ secrets.HASSLYNKCORELEASEBOTID }}
+          private-key: ${{ secrets.HASSLYNKCORELEASEBOTPRIVATEKEY }}
 
       - name: Checkout
         uses: actions/checkout@v4
