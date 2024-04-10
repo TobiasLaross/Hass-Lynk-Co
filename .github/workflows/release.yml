@@ -1,0 +1,37 @@
+name: Create release tag 
+on: 
+  push:
+    branches: 
+      - main
+    paths:
+      - 'custom_components/Hass-Lynk-Co/manifest.json'
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate GitHub App token
+        id: app-token
+        uses: tibdex/create-github-app-token@v1
+        with:
+          app_id: ${{ secrets.HASSLYNKCORELEASEBOTID }}
+          private_key: ${{ secrets.HASSLYNKCORELEASEBOTPRIVATEKEY }}
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ steps.app-token.outputs.token }}
+
+      - name: Configure git
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+
+      - name: Extract version and create tag
+        run: |
+          VERSION=$(jq -r '.version' custom_components/Hass-Lynk-Co/manifest.json)
+          echo "Creating tag for version v$VERSION"
+          git tag "v$VERSION"
+          git push origin "v$VERSION"
