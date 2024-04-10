@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'manifest.json'
+      - custom_components/Hass-Lynk-Co/manifest.json'
 
 jobs:
   release:
@@ -20,7 +20,7 @@ jobs:
         pip install setuptools wheel
     - name: Extract version from manifest.json
       id: version
-      run: echo "::set-output name=VERSION::$(jq -r .version manifest.json)"
+      run: echo "::set-output name=VERSION::$(jq -r .version custom_components/Hass-Lynk-Co/manifest.json)"
       shell: bash
     - name: Create Release
       uses: marvinpinto/action-automatic-releases@latest
