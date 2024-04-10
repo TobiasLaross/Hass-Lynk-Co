@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - custom_components/Hass-Lynk-Co/manifest.json'
+  workflow_dispatch:
 
 jobs:
   release:
