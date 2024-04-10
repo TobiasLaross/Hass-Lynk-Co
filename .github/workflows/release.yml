@@ -12,6 +12,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - name: Setup Python
+      uses: actions/setup-python@v2
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install setuptools wheel
     - name: Extract version from manifest.json
       id: version
       run: echo "::set-output name=VERSION::$(jq -r .version manifest.json)"
@@ -20,8 +26,6 @@ jobs:
       uses: marvinpinto/action-automatic-releases@latest
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
-        automatic_release_tag: "${{ steps.version.outputs.VERSION }}"
-        title: "Release ${{ steps.version.outputs.VERSION }}"
-        files: |
-          path/to/your-component.zip
+        automatic_release_tag: "v${{ steps.version.outputs.VERSION }}"
+        title: "Release v${{ steps.version.outputs.VERSION }}"
         prerelease: false
