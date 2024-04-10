@@ -17,5 +17,13 @@ CONFIG_PASSWORD_KEY = "password"
 CONFIG_2FA_KEY = "2fa"
 
 # Service keys
+SERVICE_REFRESH_TOKENS_KEY = "refresh_tokens"
+SERVICE_START_CLIMATE_KEY = "start_climate"
+SERVICE_STOP_CLIMATE_KEY = "stop_climate"
+SERVICE_LOCK_DOORS_KEY = "lock_doors"
+SERVICE_UNLOCK_DOORS_KEY = "unlock_doors"
+SERVICE_START_FLASHLIGHT_KEY = "start_flash_lights"
+SERVICE_STOP_FLASHLIGHT_KEY = "stop_flash_lights"
+SERVICE_MANUAL_UPDATE_KEY = "manual_update_data"
 SERVICE_START_ENGINE_KEY = "start_engine"
 SERVICE_STOP_ENGINE_KEY = "stop_engine"

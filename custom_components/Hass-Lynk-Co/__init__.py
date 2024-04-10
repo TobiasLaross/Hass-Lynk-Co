@@ -8,10 +8,17 @@ from .const import (
     CONFIG_SCAN_INTERVAL_KEY,
     DOMAIN,
     COORDINATOR,
+    SERVICE_LOCK_DOORS_KEY,
+    SERVICE_MANUAL_UPDATE_KEY,
+    SERVICE_REFRESH_TOKENS_KEY,
+    SERVICE_START_FLASHLIGHT_KEY,
+    SERVICE_STOP_CLIMATE_KEY,
     SERVICE_STOP_ENGINE_KEY,
     CONFIG_EXPERIMENTAL_KEY,
     CONFIG_VIN_KEY,
     SERVICE_START_ENGINE_KEY,
+    SERVICE_STOP_FLASHLIGHT_KEY,
+    SERVICE_UNLOCK_DOORS_KEY,
 )
 from .token_manager import refresh_tokens
 from .remote_control_manager import (
@@ -108,17 +115,23 @@ async def register_services(hass: HomeAssistant, entry: ConfigEntry):
         await stop_engine(hass, vin)
 
     # Common services registration
-    hass.services.async_register(DOMAIN, "refresh_tokens", refresh_tokens_service)
-    hass.services.async_register(DOMAIN, "start_climate", start_climate_service)
-    hass.services.async_register(DOMAIN, "stop_climate", stop_climate_service)
-    hass.services.async_register(DOMAIN, "lock_doors", lock_doors_service)
-    hass.services.async_register(DOMAIN, "unlock_doors", unlock_doors_service)
     hass.services.async_register(
-        DOMAIN, "start_flash_lights", start_flash_lights_service
+        DOMAIN, SERVICE_REFRESH_TOKENS_KEY, refresh_tokens_service
     )
-    hass.services.async_register(DOMAIN, "stop_flash_lights", stop_flash_lights_service)
     hass.services.async_register(
-        DOMAIN, "manual_update_data", manual_update_data_service
+        DOMAIN, SERVICE_START_ENGINE_KEY, start_climate_service
+    )
+    hass.services.async_register(DOMAIN, SERVICE_STOP_CLIMATE_KEY, stop_climate_service)
+    hass.services.async_register(DOMAIN, SERVICE_LOCK_DOORS_KEY, lock_doors_service)
+    hass.services.async_register(DOMAIN, SERVICE_UNLOCK_DOORS_KEY, unlock_doors_service)
+    hass.services.async_register(
+        DOMAIN, SERVICE_START_FLASHLIGHT_KEY, start_flash_lights_service
+    )
+    hass.services.async_register(
+        DOMAIN, SERVICE_STOP_FLASHLIGHT_KEY, stop_flash_lights_service
+    )
+    hass.services.async_register(
+        DOMAIN, SERVICE_MANUAL_UPDATE_KEY, manual_update_data_service
     )
 
     # Experimental services
