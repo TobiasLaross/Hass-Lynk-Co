@@ -13,22 +13,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/checkout@v4
 
       - name: Extract version from manifest.json
-        id: extract_version
         run: |
-          echo "VERSION=$(jq -r '.version' custom_components/Hass-Lynk-Co/manifest.json)" >> $GITHUB_ENV
+          VERSION=$(jq -r '.version' custom_components/Hass-Lynk-Co/manifest.json)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
 
       - name: Configure Git
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
 
-      - name: Create Tag
+      - name: Create and Push Tag
         run: |
-          git tag ${{ env.VERSION }}
-          git push origin ${{ env.VERSION }}
+          if git rev-parse "$VERSION" >/dev/null 2>&1; then
+              echo "Tag $VERSION already exists."
+          else
+              git tag $VERSION
+              git push origin $VERSION
+          fi
