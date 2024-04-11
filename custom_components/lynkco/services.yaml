@@ -7,6 +7,7 @@ start_climate:
   description: Starts the pre heating at the specified level.
   fields:
     duration_in_minutes:
+      name: "Duration in Minutes"
       description: "Maximum time to run pre climate"
       required: false
       example: 15
@@ -16,6 +17,7 @@ start_climate:
           max: 30
           mode: box
     climate_level:
+      name: "Climate Level"
       description: "Desired level of climate control."
       required: false
       example: "MEDIUM"
@@ -55,6 +57,7 @@ start_engine:
   description: Starts the engine, this is an undocumented feature, see README for details
   fields:
     duration_in_minutes:
+      name: "Duration in Minutes"
       description: "Maximum time to run engine"
       required: false
       example: 15

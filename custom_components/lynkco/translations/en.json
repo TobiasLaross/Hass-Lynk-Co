@@ -34,7 +34,9 @@
         "title": "Lynk & Co Integration Settings",
         "description": "Configure your Lynk & Co integration settings.",
         "data": {
-          "experimental": "Experimental features (Not supported, see README)"
+          "experimental": "Experimental features (Not supported, see README)",
+          "refresh_interval": "At which interval to fetch car updates",
+          "scan_interval": "Scan Interval (min)"
         }
       }
     }
