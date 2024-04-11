@@ -32,18 +32,17 @@ jobs:
       - name: Extract version and create tag
         run: |
           VERSION=$(jq -r '.version' custom_components/lynkco/manifest.json)
-          echo "::set-output name=VERSION::$VERSION"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "Creating tag for version v$VERSION"
           git tag "v$VERSION"
           git push origin "v$VERSION"
 
       - name: Create GitHub Release
-        id: create_release
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }} # Set the GitHub App token as GITHUB_TOKEN environment variable
         with:
-          tag_name: v${{ steps.version_extract.outputs.VERSION }}
-          release_name: Release v${{ steps.version_extract.outputs.VERSION }}
+          tag_name: v${{ env.VERSION }}
+          release_name: Release v${{ env.VERSION }}
           draft: false
           prerelease: false
