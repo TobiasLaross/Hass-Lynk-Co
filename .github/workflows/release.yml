@@ -4,7 +4,7 @@ on:
     branches: 
       - main
     paths:
-      - 'custom_components/Hass-Lynk-Co/manifest.json'
+      - 'custom_components/lynkco/manifest.json'
   workflow_dispatch:
 
 jobs:
@@ -31,7 +31,7 @@ jobs:
 
       - name: Extract version and create tag
         run: |
-          VERSION=$(jq -r '.version' custom_components/Hass-Lynk-Co/manifest.json)
+          VERSION=$(jq -r '.version' custom_components/lynkco/manifest.json)
           echo "Creating tag for version v$VERSION"
           git tag "v$VERSION"
           git push origin "v$VERSION"
