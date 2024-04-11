@@ -1,0 +1,35 @@
+name: Verify Version Match
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'custom_components/lynkco/manifest.json'
+
+jobs:
+  verify-version-match:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Extract version from manifest.json
+        id: manifest-version
+        run: |
+          VERSION=$(jq -r '.version' custom_components/lynkco/manifest.json)
+          echo "::set-output name=version::$VERSION"
+
+      - name: Extract first line from changelog
+        id: changelog-version
+        run: |
+          FIRST_LINE=$(head -n 1 CHANGELOG)
+          echo "::set-output name=first_line::$FIRST_LINE"
+
+      - name: Compare versions
+        run: |
+          if [ "${{ steps.manifest-version.outputs.version }}" != "${{ steps.changelog.outputs.first_line }}" ]; then
+            echo "Error: The version in manifest.json does not match the first line of changelog"
+            exit 1
+          fi

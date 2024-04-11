@@ -37,12 +37,19 @@ jobs:
           git tag "v$VERSION"
           git push origin "v$VERSION"
 
+      - name: Read changelog notes
+        id: changelog-notes
+        run: |
+          BODY=$(tail -n +2 CHANGELOG)
+          echo "::set-output name=body::$BODY"
+
       - name: Create GitHub Release
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }} # Set the GitHub App token as GITHUB_TOKEN environment variable
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
         with:
           tag_name: v${{ env.VERSION }}
-          release_name: Release v${{ env.VERSION }}
+          release_name: v${{ env.VERSION }}
+          body: ${{ steps.changelog-notes.outputs.body }}
           draft: false
           prerelease: false
