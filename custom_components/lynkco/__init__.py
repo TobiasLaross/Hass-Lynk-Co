@@ -11,6 +11,7 @@ from .const import (
     SERVICE_LOCK_DOORS_KEY,
     SERVICE_MANUAL_UPDATE_KEY,
     SERVICE_REFRESH_TOKENS_KEY,
+    SERVICE_START_CLIMATE_KEY,
     SERVICE_START_FLASHLIGHT_KEY,
     SERVICE_STOP_CLIMATE_KEY,
     SERVICE_STOP_ENGINE_KEY,
@@ -119,7 +120,7 @@ async def register_services(hass: HomeAssistant, entry: ConfigEntry):
         DOMAIN, SERVICE_REFRESH_TOKENS_KEY, refresh_tokens_service
     )
     hass.services.async_register(
-        DOMAIN, SERVICE_START_ENGINE_KEY, start_climate_service
+        DOMAIN, SERVICE_START_CLIMATE_KEY, start_climate_service
     )
     hass.services.async_register(DOMAIN, SERVICE_STOP_CLIMATE_KEY, stop_climate_service)
     hass.services.async_register(DOMAIN, SERVICE_LOCK_DOORS_KEY, lock_doors_service)

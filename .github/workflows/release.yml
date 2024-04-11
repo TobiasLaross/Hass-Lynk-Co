@@ -35,3 +35,14 @@ jobs:
           echo "Creating tag for version v$VERSION"
           git tag "v$VERSION"
           git push origin "v$VERSION"
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+        with:
+          tag_name: "v$VERSION"
+          release_name: Release v$VERSION
+          draft: false
+          prerelease: false
