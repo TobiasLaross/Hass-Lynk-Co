@@ -29,7 +29,7 @@ jobs:
 
       - name: Compare versions
         run: |
-          if [ "${{ steps.manifest-version.outputs.version }}" != "${{ steps.changelog.outputs.first_line }}" ]; then
-            echo "Error: The version in manifest.json does not match the first line of changelog"
+          if [ "${{ steps.manifest-version.outputs.version }}" != "${{ steps.changelog-version.outputs.first_line }}" ]; then
+            echo "Error: Version mismatch detected. manifest.json version: ${{ steps.manifest-version.outputs.version }}, CHANGELOG version: ${{ steps.changelog-version.outputs.first_line }}"
             exit 1
           fi
