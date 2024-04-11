@@ -32,6 +32,7 @@ jobs:
       - name: Extract version and create tag
         run: |
           VERSION=$(jq -r '.version' custom_components/lynkco/manifest.json)
+          echo "::set-output name=VERSION::$VERSION"
           echo "Creating tag for version v$VERSION"
           git tag "v$VERSION"
           git push origin "v$VERSION"
