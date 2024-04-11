@@ -3,7 +3,7 @@
     "name": "Lynk & Co",
     "documentation": "https://www.github.com/tobiaslaross/Hass-Lynk-Co",
     "config_flow": true,
-    "version": "0.1.4",
+    "version": "0.1.5",
     "requirements": [
         "requests>=2.31.0",
         "pkce>=1.0.3"
