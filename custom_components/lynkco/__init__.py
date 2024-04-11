@@ -110,7 +110,7 @@ async def register_services(hass: HomeAssistant, entry: ConfigEntry):
         await manual_update_data(hass, entry)
 
     async def start_engine_service(call):
-        await start_engine(hass, vin, call.get("duration_in_minutes", 15))
+        await start_engine(hass, vin, call.data.get("duration_in_minutes", 15))
 
     async def stop_engine_service(call):
         await stop_engine(hass, vin)
