@@ -22,6 +22,12 @@ async def async_setup_entry(hass, entry, async_add_entities):
             LynkCoSensor(
                 coordinator,
                 vin,
+                "Lynk & Co Odometer Updated",
+                "vehicle_record.odometer.vehicleUpdatedAt",
+            ),
+            LynkCoSensor(
+                coordinator,
+                vin,
                 "Lynk & Co Battery",
                 "vehicle_record.electricStatus.chargeLevel",
                 "vehicle_record.electricStatus.vehicleUpdatedAt",
@@ -30,10 +36,22 @@ async def async_setup_entry(hass, entry, async_add_entities):
             LynkCoSensor(
                 coordinator,
                 vin,
+                "Lynk & Co Battery Updated",
+                "vehicle_record.electricStatus.vehicleUpdatedAt",
+            ),
+            LynkCoSensor(
+                coordinator,
+                vin,
                 "Lynk & Co Fuel Level",
                 "vehicle_record.fuel.level",
                 "vehicle_record.fuel.vehicleUpdatedAt",
                 "liters",
+            ),
+            LynkCoSensor(
+                coordinator,
+                vin,
+                "Lynk & Co Fuel Updated",
+                "vehicle_record.fuel.vehicleUpdatedAt",
             ),
             LynkCoSensor(
                 coordinator,
@@ -50,6 +68,12 @@ async def async_setup_entry(hass, entry, async_add_entities):
                 "vehicle_record.fuel.distanceToEmpty",
                 "vehicle_record.fuel.vehicleUpdatedAt",
                 "km",
+            ),
+            LynkCoSensor(
+                coordinator,
+                vin,
+                "Lynk & Co Time until charged updated",
+                "vehicle_record.electricStatus.vehicleUpdatedAt",
             ),
             LynkCoSensor(
                 coordinator,
@@ -78,6 +102,12 @@ async def async_setup_entry(hass, entry, async_add_entities):
             LynkCoSensor(
                 coordinator,
                 vin,
+                "Lynk & Co Climate Updated",
+                "vehicle_record.climate.vehicleUpdatedAt",
+            ),
+            LynkCoSensor(
+                coordinator,
+                vin,
                 "Lynk & Co Exterior temperature",
                 "vehicle_record.climate.exteriorTemp.temp",
                 "vehicle_record.climate.vehicleUpdatedAt",
@@ -89,7 +119,12 @@ async def async_setup_entry(hass, entry, async_add_entities):
                 "Lynk & Co Charger connection status",
                 "vehicle_shadow.evs.chargerStatusData.chargerConnectionStatus",
                 "vehicle_shadow.evs.chargerStatusData.updatedAt",
-                "",
+            ),
+            LynkCoSensor(
+                coordinator,
+                vin,
+                "Lynk & Co Charger Updated",
+                "vehicle_shadow.evs.chargerStatusData.updatedAt",
             ),
             LynkCoSensor(
                 coordinator,
@@ -110,6 +145,12 @@ async def async_setup_entry(hass, entry, async_add_entities):
             LynkCoSensor(
                 coordinator,
                 vin,
+                "Lynk & Co Address Updated",
+                "vehicle_record.position.vehicleUpdatedAt",
+            ),
+            LynkCoSensor(
+                coordinator,
+                vin,
                 "Lynk & Co Address raw",
                 "vehicle_address_raw",
                 "vehicle_record.position.vehicleUpdatedAt",
@@ -126,9 +167,27 @@ async def async_setup_entry(hass, entry, async_add_entities):
             LynkCoSensor(
                 coordinator,
                 vin,
+                "Lynk & Co Door lock Updated",
+                "vehicle_shadow.vls.doorLocksUpdatedAt",
+            ),
+            LynkCoSensor(
+                coordinator,
+                vin,
                 "Lynk & Co Last updated by car",
                 "vehicle_record.updatedAt",
                 "",
+            ),
+            LynkCoSensor(
+                coordinator,
+                vin,
+                "Vehicle is running updated",
+                "vehicle_shadow.bvs.engineStatusUpdatedAt",
+            ),
+            LynkCoSensor(
+                coordinator,
+                vin,
+                "Lynk & Co Locks Updated",
+                "vehicle_shadow.vls.doorLocksUpdatedAt",
             ),
         ]
     )

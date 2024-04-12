@@ -37,10 +37,10 @@ jobs:
           git tag "v$VERSION"
           git push origin "v$VERSION"
 
-      - name: Read changelog notes
-        id: changelog-notes
+      - name: Read release notes
+        id: release-notes
         run: |
-          BODY=$(tail -n +2 CHANGELOG)
+          BODY=$(tail -n +2 release-notes)
           echo "::set-output name=body::$BODY"
 
       - name: Create GitHub Release
@@ -50,6 +50,6 @@ jobs:
         with:
           tag_name: v${{ env.VERSION }}
           release_name: v${{ env.VERSION }}
-          body: ${{ steps.changelog-notes.outputs.body }}
+          body: ${{ steps.release-notes.outputs.body }}
           draft: false
           prerelease: false

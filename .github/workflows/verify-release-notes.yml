@@ -21,15 +21,15 @@ jobs:
           VERSION=$(jq -r '.version' custom_components/lynkco/manifest.json)
           echo "::set-output name=version::$VERSION"
 
-      - name: Extract first line from changelog
-        id: changelog-version
+      - name: Extract first line from release notes
+        id: release-version
         run: |
-          FIRST_LINE=$(head -n 1 CHANGELOG)
+          FIRST_LINE=$(head -n 1 release-notes)
           echo "::set-output name=first_line::$FIRST_LINE"
 
       - name: Compare versions
         run: |
-          if [ "${{ steps.manifest-version.outputs.version }}" != "${{ steps.changelog-version.outputs.first_line }}" ]; then
-            echo "Error: Version mismatch detected. manifest.json version: ${{ steps.manifest-version.outputs.version }}, CHANGELOG version: ${{ steps.changelog-version.outputs.first_line }}"
+          if [ "${{ steps.manifest-version.outputs.version }}" != "${{ steps.release-version.outputs.first_line }}" ]; then
+            echo "Error: Version mismatch detected. manifest.json version: ${{ steps.manifest-version.outputs.version }}, release version: ${{ steps.release-version.outputs.first_line }}"
             exit 1
           fi
