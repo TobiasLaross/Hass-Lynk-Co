@@ -4,9 +4,9 @@
 This custom component is in **early development stages**. Features and functionalities are subject to change, and you might encounter bugs or unexpected behaviors. We encourage users to report any issues they find. Your feedback is invaluable in helping us improve. Please proceed with caution and at your own risk.
 
 ## Introduction
-This custom component allows Home Assistant users to integrate and control their Lynk & Co vehicles directly from Home Assistant. 
-It provides the functionality for multiple users to control pre climate and sensor monitoring. 
-An experimental service to start and stop the engine is included as well as lock and unlock doors, and monitor various vehicle 
+This custom component allows Home Assistant users to integrate and control their Lynk & Co vehicles directly from Home Assistant.
+It provides the functionality for multiple users to control pre climate and sensor monitoring.
+An experimental service to start and stop the engine is included as well as lock and unlock doors, and monitor various vehicle
 statuses like battery level, fuel level, and climate control status, enhancing the smart home experience with vehicle management.
 This has been tested on european models only.
 
