@@ -6,6 +6,35 @@ import logging
 _LOGGER = logging.getLogger(__name__)
 
 
+async def async_setup_entry(hass, entry, async_add_entities):
+    coordinator = hass.data[DOMAIN][entry.entry_id][COORDINATOR]
+    vin = entry.data.get("vin")
+    async_add_entities(
+        [
+            LynkCoBinarySensor(
+                coordinator,
+                vin,
+                "Pre climate active",
+                "vehicle_record.climate.preClimateActive",
+                icon="mdi:air-conditioner",
+            ),
+            LynkCoBinarySensor(
+                coordinator,
+                vin,
+                "Vehicle is running",
+                "vehicle_shadow.bvs.engineStatus",
+                icon="mdi:engine",
+            ),
+            LynkCoBinarySensor(
+                coordinator,
+                vin,
+                "Lynk & Co Position is trusted",
+                "vehicle_record.position.canBeTrusted",
+            ),
+        ]
+    )
+
+
 class LynkCoBinarySensor(CoordinatorEntity, BinarySensorEntity):
     def __init__(
         self,
@@ -99,28 +128,3 @@ class LynkCoBinarySensor(CoordinatorEntity, BinarySensorEntity):
             if data:
                 attributes["car_updated_at"] = data
         return attributes
-
-
-async def async_setup_entry(hass, entry, async_add_entities):
-    coordinator = hass.data[DOMAIN][entry.entry_id][COORDINATOR]
-    vin = entry.data.get("vin")
-    async_add_entities(
-        [
-            LynkCoBinarySensor(
-                coordinator,
-                vin,
-                "Pre climate active",
-                "vehicle_record.climate.preClimateActive",
-                "vehicle_record.climate.vehicleUpdatedAt",
-                icon="mdi:air-conditioner",
-            ),
-            LynkCoBinarySensor(
-                coordinator,
-                vin,
-                "Vehicle is running",
-                "vehicle_shadow.bvs.engineStatus",
-                "vehicle_shadow.bvs.engineStatusUpdatedAt",
-                icon="mdi:engine",
-            ),
-        ]
-    )

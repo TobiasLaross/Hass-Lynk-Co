@@ -95,6 +95,8 @@ Binary sensors indicate specific vehicle states that have a true or false condit
 - **Pre Climate Active**: Indicates whether the pre-climate control system is active, ensuring the vehicle's interior is at a comfortable temperature before you enter. It uses the icon `mdi:air-conditioner` to visually represent this feature in the Home Assistant UI.
 - **Vehicle is Running**: Shows if the vehicle's engine is currently running. This sensor is crucial for understanding the immediate operational state of your vehicle and uses the `mdi:engine` icon for easy identification.
 
+For a comprehensive list of all entities, including detailed descriptions and additional sensors, please refer to [Detailed Entities Information](entities.md).
+
 ## Troubleshooting
 
 - **2FA Code Issues**: Ensure the code is entered correctly and within its validity period. Generate a new code if issues persist.
