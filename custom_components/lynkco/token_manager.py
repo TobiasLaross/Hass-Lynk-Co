@@ -1,19 +1,14 @@
-import aiohttp
 import base64
-import os
 import json
 import logging
+import os
 import time
 
+import aiohttp
 from homeassistant.helpers.storage import Store
-from .const import (
-    DOMAIN,
-    STORAGE_REFRESH_TOKEN_KEY,
-    STORAGE_TOKEN_KEY,
-    STORAGE_USER_ID_KEY,
-    STORAGE_VERSION,
-    STORAGE_CCC_TOKEN_KEY,
-)
+
+from .const import (DOMAIN, STORAGE_CCC_TOKEN_KEY, STORAGE_REFRESH_TOKEN_KEY,
+                    STORAGE_TOKEN_KEY, STORAGE_USER_ID_KEY, STORAGE_VERSION)
 
 _LOGGER = logging.getLogger(__name__)
 
