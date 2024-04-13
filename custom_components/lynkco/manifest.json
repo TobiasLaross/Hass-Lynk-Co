@@ -1,17 +1,16 @@
 {
     "domain": "lynkco",
     "name": "Lynk & Co",
-    "documentation": "https://www.github.com/tobiaslaross/Hass-Lynk-Co",
-    "issue_tracker": "https://github.com/tobiaslaross/Hass-Lynk-Co/issues",
+    "codeowners": [
+        "@TobiasLaross"
+    ],
     "config_flow": true,
-    "version": "0.3.0",
+    "documentation": "https://www.github.com/tobiaslaross/Hass-Lynk-Co",
+    "iot_class": "cloud_polling",
+    "issue_tracker": "https://github.com/tobiaslaross/Hass-Lynk-Co/issues",
     "requirements": [
         "requests>=2.31.0",
         "pkce>=1.0.3"
     ],
-    "dependencies": [],
-    "codeowners": [
-        "@TobiasLaross"
-    ],
-    "iot_class": "cloud_polling"
+    "version": "0.3.0"
 }
