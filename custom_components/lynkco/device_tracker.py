@@ -1,8 +1,10 @@
-from homeassistant.helpers.update_coordinator import CoordinatorEntity
+import logging
+
 from homeassistant.components.device_tracker import SourceType
 from homeassistant.components.device_tracker.config_entry import TrackerEntity
-from .const import DOMAIN, COORDINATOR
-import logging
+from homeassistant.helpers.update_coordinator import CoordinatorEntity
+
+from .const import COORDINATOR, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 

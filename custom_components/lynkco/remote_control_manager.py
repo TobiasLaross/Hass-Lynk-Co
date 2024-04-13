@@ -1,5 +1,7 @@
-import aiohttp
 import logging
+
+import aiohttp
+
 from .token_manager import get_ccc_token, get_user_id
 
 _LOGGER = logging.getLogger(__name__)

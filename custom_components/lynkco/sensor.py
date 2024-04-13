@@ -1,16 +1,7 @@
-from .const import CONFIG_VIN_KEY, DOMAIN, COORDINATOR
-from .sensors import (
-    battery,
-    charger_status_data,
-    climate,
-    trip,
-    speed,
-    odometer,
-    position,
-    maintenance_status,
-    fuel,
-    electric_status,
-)
+from .const import CONFIG_VIN_KEY, COORDINATOR, DOMAIN
+from .sensors import (battery, charger_status_data, climate, electric_status,
+                      fuel, maintenance_status, odometer, position, speed,
+                      trip)
 from .sensors.lynk_co_sensor import LynkCoSensor
 
 

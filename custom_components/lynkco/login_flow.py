@@ -1,8 +1,9 @@
-import urllib.parse
-import pkce
-from urllib.parse import quote_plus
 import json
 import logging
+import urllib.parse
+from urllib.parse import quote_plus
+
+import pkce
 
 # TODO: Try new login flow
 _LOGGER = logging.getLogger(__name__)

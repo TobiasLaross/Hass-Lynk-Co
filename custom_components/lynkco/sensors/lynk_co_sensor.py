@@ -1,7 +1,9 @@
-from ..const import DOMAIN
+import logging
+
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
-import logging
+
+from ..const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 

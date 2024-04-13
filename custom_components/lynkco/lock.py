@@ -1,11 +1,10 @@
+import logging
+
 from homeassistant.components.lock import LockEntity
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
-from .const import DOMAIN, COORDINATOR
-import logging
-from .remote_control_manager import (
-    unlock_doors,
-    lock_doors,
-)
+
+from .const import COORDINATOR, DOMAIN
+from .remote_control_manager import lock_doors, unlock_doors
 
 _LOGGER = logging.getLogger(__name__)
 
