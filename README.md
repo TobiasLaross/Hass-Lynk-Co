@@ -1,5 +1,7 @@
 # Lynk & Co Home Assistant Custom Component
 
+![Integration Usage](https://img.shields.io/badge/dynamic/json?color=41BDF5&logo=home-assistant&label=integration%20usage&suffix=%20installs&cacheSeconds=15600&url=https://analytics.home-assistant.io/custom_integrations.json&query=$.lynkco.total)
+
 ## Warning :warning:
 This custom component is in **early development stages**. Features and functionalities are subject to change, and you might encounter bugs or unexpected behaviors. We encourage users to report any issues they find. Your feedback is invaluable in helping us improve. Please proceed with caution and at your own risk.
 
