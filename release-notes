@@ -1,2 +1,2 @@
 1.0.1
-Fixed issue with unit of measurement was missing by removing not car updated at attribute which isn't used.
+Fixed an issue where the unit of measurement was missing by removing the unused 'car_updated_at' attribute.
