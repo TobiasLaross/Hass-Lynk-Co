@@ -1,7 +1,16 @@
 from .const import CONFIG_VIN_KEY, COORDINATOR, DOMAIN
-from .sensors import (battery, charger_status_data, climate, electric_status,
-                      fuel, maintenance_status, odometer, position, speed,
-                      trip)
+from .sensors import (
+    battery,
+    charger_status_data,
+    climate,
+    electric_status,
+    fuel,
+    maintenance_status,
+    odometer,
+    position,
+    speed,
+    trip,
+)
 from .sensors.lynk_co_sensor import LynkCoSensor
 
 
@@ -43,12 +52,6 @@ async def async_setup_entry(hass, entry, async_add_entities):
                 vin,
                 "Vehicle is running updated",
                 "vehicle_shadow.bvs.engineStatusUpdatedAt",
-            ),
-            LynkCoSensor(
-                coordinator,
-                vin,
-                "Lynk & Co Locks Updated",
-                "vehicle_shadow.vls.doorLocksUpdatedAt",
             ),
         ]
     )

@@ -8,7 +8,6 @@ def create_sensors(coordinator, vin):
             vin,
             "Lynk & Co Charger connection status",
             "vehicle_shadow.evs.chargerStatusData.chargerConnectionStatus",
-            "vehicle_shadow.evs.chargerStatusData.updatedAt",
         ),
         LynkCoSensor(
             coordinator,
@@ -21,8 +20,6 @@ def create_sensors(coordinator, vin):
             vin,
             "Lynk & Co Charge state",
             "vehicle_shadow.evs.chargerStatusData.chargerState",
-            "vehicle_shadow.evs.chargerStatusData.updatedAt",
-            "",
         ),
     ]
     return sensors
