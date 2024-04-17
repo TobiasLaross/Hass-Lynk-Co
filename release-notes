@@ -1,3 +1,2 @@
-1.0.0
-Preparations for HACS store.
-This release marks the transition out of early development stages.
+1.0.1
+Fixed issue with unit of measurement was missing by removing not car updated at attribute which isn't used.

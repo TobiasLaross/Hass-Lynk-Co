@@ -15,7 +15,6 @@ class LynkCoSensor(CoordinatorEntity, Entity):
         vin,
         name,
         data_path,
-        car_updated_at=None,
         unit_of_measurement=None,
     ):
         super().__init__(coordinator)
@@ -23,9 +22,6 @@ class LynkCoSensor(CoordinatorEntity, Entity):
         self._vin = vin
         self._name = name
         self._data_path = data_path.split(".")
-        self._car_updated_at_path = (
-            car_updated_at.split(".") if car_updated_at else None
-        )
         self._unit_of_measurement = unit_of_measurement
 
     @property
@@ -70,15 +66,3 @@ class LynkCoSensor(CoordinatorEntity, Entity):
     @property
     def unique_id(self):
         return f"{self._vin}_{self._name}"
-
-    @property
-    def extra_state_attributes(self):
-        attributes = {}
-        if self._car_updated_at_path:
-            data = self.coordinator.data
-            for key in self._car_updated_at_path:
-                if data:
-                    data = data.get(key)
-            if data:
-                attributes["car_updated_at"] = data
-        return attributes

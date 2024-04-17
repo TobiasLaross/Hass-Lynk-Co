@@ -20,7 +20,6 @@ async def async_setup_entry(hass, entry, async_add_entities):
                 vin,
                 "Lynk & Co Locks",
                 "vehicle_shadow.vls.doorLocksStatus",
-                "vehicle_shadow.vls.doorLocksUpdatedAt",
             ),
         ]
     )
