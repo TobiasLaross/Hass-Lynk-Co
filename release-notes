@@ -1,2 +1,2 @@
-1.0.1
-Fixed an issue where the unit of measurement was missing by removing the unused 'car_updated_at' attribute.
+1.1.0
+Renamed manual_update_data service to force_update_data, adding data polling when expecting new state of sensor.

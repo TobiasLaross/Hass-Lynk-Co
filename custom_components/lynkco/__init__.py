@@ -4,21 +4,52 @@ from datetime import datetime, timedelta
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.update_coordinator import (DataUpdateCoordinator,
-                                                      UpdateFailed)
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
+from homeassistant.helpers.debounce import Debouncer
 
-from .const import (CONFIG_EXPERIMENTAL_KEY, CONFIG_SCAN_INTERVAL_KEY,
-                    CONFIG_VIN_KEY, COORDINATOR, DOMAIN,
-                    SERVICE_LOCK_DOORS_KEY, SERVICE_MANUAL_UPDATE_KEY,
-                    SERVICE_REFRESH_TOKENS_KEY, SERVICE_START_CLIMATE_KEY,
-                    SERVICE_START_ENGINE_KEY, SERVICE_START_FLASHLIGHT_KEY,
-                    SERVICE_STOP_CLIMATE_KEY, SERVICE_STOP_ENGINE_KEY,
-                    SERVICE_STOP_FLASHLIGHT_KEY, SERVICE_UNLOCK_DOORS_KEY)
-from .data_fetcher import async_fetch_vehicle_data
-from .remote_control_manager import (lock_doors, start_climate, start_engine,
-                                     start_flash_lights, stop_climate,
-                                     stop_engine, stop_flash_lights,
-                                     unlock_doors)
+from .expected_state_monitor import ExpectedStateMonitor
+
+from .const import (
+    CONFIG_EXPERIMENTAL_KEY,
+    CONFIG_SCAN_INTERVAL_KEY,
+    CONFIG_VIN_KEY,
+    COORDINATOR,
+    DATA_EXPECTED_STATE,
+    DATA_IS_FORCE_UPDATE,
+    DOMAIN,
+    EXPECTED_STATE_CLIMATE_OFF,
+    EXPECTED_STATE_CLIMATE_ON,
+    EXPECTED_STATE_LOCKED,
+    EXPECTED_STATE_UNLOCKED,
+    EXPECTED_STATE_ENGINE_ON,
+    EXPECTED_STATE_ENGINE_OFF,
+    SERVICE_LOCK_DOORS_KEY,
+    SERVICE_FORCE_UPDATE_KEY,
+    SERVICE_REFRESH_TOKENS_KEY,
+    SERVICE_START_CLIMATE_KEY,
+    SERVICE_START_ENGINE_KEY,
+    SERVICE_START_FLASHLIGHT_KEY,
+    SERVICE_STOP_CLIMATE_KEY,
+    SERVICE_STOP_ENGINE_KEY,
+    SERVICE_STOP_FLASHLIGHT_KEY,
+    SERVICE_UNLOCK_DOORS_KEY,
+)
+from .data_fetcher import (
+    async_fetch_vehicle_shadow_data,
+    async_fetch_vehicle_record_data,
+    async_fetch_vehicle_address_data,
+)
+from .remote_control_manager import (
+    lock_doors,
+    start_climate,
+    start_engine,
+    start_flash_lights,
+    stop_climate,
+    stop_engine,
+    stop_flash_lights,
+    unlock_doors,
+    force_update_data,
+)
 from .token_manager import refresh_tokens
 
 _LOGGER = logging.getLogger(__name__)
@@ -32,12 +63,14 @@ async def async_setup(hass: HomeAssistant, config: dict):
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Set up a configuration entry."""
     hass.data.setdefault(DOMAIN, {})
+    expected_state_monitor = ExpectedStateMonitor()
     hass.data[DOMAIN][entry.entry_id] = {
-        "is_manual_update": False,
-        "vin": entry.data.get(CONFIG_VIN_KEY),
+        DATA_IS_FORCE_UPDATE: False,
+        CONFIG_VIN_KEY: entry.data.get(CONFIG_VIN_KEY),
+        DATA_EXPECTED_STATE: expected_state_monitor,
     }
 
-    _LOGGER.info(f"Experimental: {entry.options.get(CONFIG_EXPERIMENTAL_KEY, False)}")
+    _LOGGER.debug(f"Experimental: {entry.options.get(CONFIG_EXPERIMENTAL_KEY, False)}")
     await setup_data_coordinator(hass, entry)
 
     entry.add_update_listener(options_update_listener)
@@ -62,6 +95,9 @@ async def options_update_listener(hass: HomeAssistant, entry: ConfigEntry):
 async def register_services(hass: HomeAssistant, entry: ConfigEntry):
     """Register or unregister services based on the experimental option."""
     vin = hass.data[DOMAIN][entry.entry_id][CONFIG_VIN_KEY]
+    expected_state_monitor: ExpectedStateMonitor = hass.data[DOMAIN][entry.entry_id][
+        DATA_EXPECTED_STATE
+    ]
     experimental = entry.options.get(CONFIG_EXPERIMENTAL_KEY, False)
     _LOGGER.info(f"Register services using experimental: {experimental}")
 
@@ -76,15 +112,23 @@ async def register_services(hass: HomeAssistant, entry: ConfigEntry):
         ).upper()
         duration_in_minutes = call.data.get("duration_in_minutes", 15)
 
+        await expected_state_monitor.expect_state(
+            EXPECTED_STATE_CLIMATE_ON, hass, entry
+        )
         await start_climate(hass, vin, climate_level, duration_in_minutes)
 
     async def stop_climate_service(call):
+        await expected_state_monitor.expect_state(
+            EXPECTED_STATE_CLIMATE_OFF, hass, entry
+        )
         await stop_climate(hass, vin)
 
     async def lock_doors_service(call):
+        await expected_state_monitor.expect_state(EXPECTED_STATE_LOCKED, hass, entry)
         await lock_doors(hass, vin)
 
     async def unlock_doors_service(call):
+        await expected_state_monitor.expect_state(EXPECTED_STATE_UNLOCKED, hass, entry)
         await unlock_doors(hass, vin)
 
     async def start_flash_lights_service(call):
@@ -93,13 +137,17 @@ async def register_services(hass: HomeAssistant, entry: ConfigEntry):
     async def stop_flash_lights_service(call):
         await stop_flash_lights(hass, vin)
 
-    async def manual_update_data_service(call):
-        await manual_update_data(hass, entry)
+    async def force_update_data_service(call):
+        await force_update_data(hass, entry)
 
     async def start_engine_service(call):
+        await expected_state_monitor.expect_state(EXPECTED_STATE_ENGINE_ON, hass, entry)
         await start_engine(hass, vin, call.data.get("duration_in_minutes", 15))
 
     async def stop_engine_service(call):
+        await expected_state_monitor.expect_state(
+            EXPECTED_STATE_ENGINE_OFF, hass, entry
+        )
         await stop_engine(hass, vin)
 
     # Common services registration
@@ -119,7 +167,7 @@ async def register_services(hass: HomeAssistant, entry: ConfigEntry):
         DOMAIN, SERVICE_STOP_FLASHLIGHT_KEY, stop_flash_lights_service
     )
     hass.services.async_register(
-        DOMAIN, SERVICE_MANUAL_UPDATE_KEY, manual_update_data_service
+        DOMAIN, SERVICE_FORCE_UPDATE_KEY, force_update_data_service
     )
 
     # Experimental services
@@ -148,13 +196,15 @@ async def safely_remove_service(hass: HomeAssistant, domain: str, service: str):
 
 async def setup_data_coordinator(hass: HomeAssistant, entry: ConfigEntry):
     update_interval_minutes = entry.options.get(CONFIG_SCAN_INTERVAL_KEY, 60)
+    _LOGGER.info(f"update: {update_interval_minutes}")
     """Setup the data update coordinator."""
     coordinator = DataUpdateCoordinator(
         hass,
         _LOGGER,
         name=f"{DOMAIN}_{entry.entry_id}_vehicle_data",
         update_method=lambda: update_data(hass, entry),
-        update_interval=timedelta(seconds=update_interval_minutes),
+        update_interval=timedelta(minutes=update_interval_minutes),
+        request_refresh_debouncer=Debouncer(hass, _LOGGER, cooldown=5, immediate=True),
     )
 
     if entry.entry_id in hass.data[DOMAIN]:
@@ -170,22 +220,21 @@ async def setup_data_coordinator(hass: HomeAssistant, entry: ConfigEntry):
 async def update_data(hass: HomeAssistant, entry: ConfigEntry):
     """Update vehicle data."""
     vin = hass.data[DOMAIN][entry.entry_id][CONFIG_VIN_KEY]
-    is_manual_update = hass.data[DOMAIN][entry.entry_id]["is_manual_update"]
+    is_force_update = hass.data[DOMAIN][entry.entry_id][DATA_IS_FORCE_UPDATE]
+    hass.data[DOMAIN][entry.entry_id][DATA_IS_FORCE_UPDATE] = False
     failed_requests = 0
     combined_data = {}
     if not vin:
         _LOGGER.error("Missing VIN for vehicle data update.")
         raise UpdateFailed("Missing VIN.")
     now = datetime.now()
-    if not is_manual_update and (1 <= now.hour <= 4):
+    if not is_force_update and (1 <= now.hour <= 4):
         _LOGGER.info("Skipping automatic update due to time restrictions.")
         return {}
-    record_url = f"https://vehicle-data-tls.aion.connectedcar.cloud/api/v1/vds/vehicles/{vin}/data/record"
-    shadow_url = f"https://vehicle-data-tls.aion.connectedcar.cloud/api/v1/vds/vehicles/{vin}/data/shadow"
 
     record, shadow = await asyncio.gather(
-        async_fetch_vehicle_data(hass, record_url),
-        async_fetch_vehicle_data(hass, shadow_url),
+        async_fetch_vehicle_record_data(hass, vin),
+        async_fetch_vehicle_shadow_data(hass, vin),
         return_exceptions=True,
     )
 
@@ -210,9 +259,9 @@ async def update_data(hass: HomeAssistant, entry: ConfigEntry):
 
     address_raw = "Unavailable"
     if latitude is not None and longitude is not None:
-        address_base_url = "https://geospatial-locator-tls.aion.connectedcar.cloud/geospatial-locator/api/geocoding/v1/position?"
-        address_url = f"{address_base_url}latitude={latitude}&longitude={longitude}"
-        address_response = await async_fetch_vehicle_data(hass, address_url)
+        address_response = await async_fetch_vehicle_address_data(
+            hass, latitude, longitude
+        )
         address = parse_address(address_response)
         if (
             isinstance(address_response, dict)
@@ -259,14 +308,6 @@ def parse_address(address_response):
     formatted_address = ", ".join(filter(None, [street_address, city]))
 
     return formatted_address
-
-
-async def manual_update_data(hass: HomeAssistant, entry: ConfigEntry):
-    """Trigger a manual data update, bypassing the time check."""
-    hass.data[DOMAIN][entry.entry_id]["is_manual_update"] = True
-    coordinator = hass.data[DOMAIN][entry.entry_id][COORDINATOR]
-    await coordinator.async_request_refresh()
-    hass.data[DOMAIN][entry.entry_id]["is_manual_update"] = False
 
 
 async def setup_platforms(hass: HomeAssistant, entry: ConfigEntry):

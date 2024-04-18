@@ -1,5 +1,10 @@
 import logging
 
+from .const import (
+    COORDINATOR,
+    DATA_IS_FORCE_UPDATE,
+    DOMAIN,
+)
 import aiohttp
 
 from .token_manager import get_ccc_token, get_user_id
@@ -57,8 +62,11 @@ async def stop_climate(hass, vin):
     data = {
         "command": "STOP",
         "dayofweek": ["ONCE"],
+        "startTimeOfDay": "00:00",
+        "durationInSeconds": 1,
         "timerId": "1",
         "ventilationItems": ["ALL"],
+        "scheduledTime": 10,
     }
     if await make_http_request(
         hass,
@@ -162,3 +170,10 @@ async def stop_flash_lights(hass, vin):
         vin,
     ):
         _LOGGER.info("Successfully sent stop flash to Lynk backend")
+
+
+async def force_update_data(hass, entry):
+    """Trigger a force data update, bypassing the nightly time check."""
+    hass.data[DOMAIN][entry.entry_id][DATA_IS_FORCE_UPDATE] = True
+    coordinator = hass.data[DOMAIN][entry.entry_id][COORDINATOR]
+    await coordinator.async_request_refresh()

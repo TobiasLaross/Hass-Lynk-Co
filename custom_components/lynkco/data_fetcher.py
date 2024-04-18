@@ -1,10 +1,27 @@
-import logging
-
 import aiohttp
+import logging
 
 from .token_manager import get_ccc_token
 
 _LOGGER = logging.getLogger(__name__)
+
+base_url = "https://vehicle-data-tls.aion.connectedcar.cloud/api/v1/vds/vehicles/"
+address_base_url = "https://geospatial-locator-tls.aion.connectedcar.cloud/geospatial-locator/api/geocoding/v1/position?"
+
+
+async def async_fetch_vehicle_address_data(hass, latitude, longitude):
+    url = f"{address_base_url}latitude={latitude}&longitude={longitude}"
+    return await async_fetch_vehicle_data(hass, url)
+
+
+async def async_fetch_vehicle_shadow_data(hass, vin):
+    url = f"{base_url}{vin}/data/shadow"
+    return await async_fetch_vehicle_data(hass, url)
+
+
+async def async_fetch_vehicle_record_data(hass, vin):
+    url = f"{base_url}{vin}/data/record"
+    return await async_fetch_vehicle_data(hass, url)
 
 
 async def async_fetch_vehicle_data(hass, url):
