@@ -40,8 +40,8 @@ unlock_doors:
   name: Unlock doors
   description: Unlock all the vehicle doors and trunk.
 
-manual_update_data:
-  name: Manually update data
+force_update_data:
+  name: Force update data
   description: Update data on demand
 
 start_flash_lights:

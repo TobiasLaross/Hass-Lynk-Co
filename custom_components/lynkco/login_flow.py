@@ -31,7 +31,7 @@ async def login(email, password, session):
     if None in (x_ms_cpim_csrf_token, x_ms_cpim_csrf_token):
         _LOGGER.error("Authorization failed, missing cookies")
         return None, None, None, None, None
-    _LOGGER.info("Authorization successful.")
+    _LOGGER.debug("Authorization successful.")
 
     success = await postLogin(
         email, password, x_ms_cpim_trans_value, x_ms_cpim_csrf_token, session
@@ -39,7 +39,7 @@ async def login(email, password, session):
     if success is False:
         _LOGGER.error("Login failed. Exiting...")
         return None, None, None, None, None
-    _LOGGER.info("Credentials accepted.")
+    _LOGGER.debug("Credentials accepted.")
 
     page_view_id, referer_url = await getCombinedSigninAndSignup(
         x_ms_cpim_csrf_token,
@@ -72,7 +72,7 @@ async def two_factor_authentication(
     if success is False:
         _LOGGER.error("Verification failed. Exiting...")
         return None, None
-    _LOGGER.info("Verification successful.")
+    _LOGGER.debug("Verification successful.")
 
     code = await getRedirect(x_ms_cpim_trans_value, page_view_id, referer_url, session)
     if code is None:
@@ -109,7 +109,7 @@ async def authorize(code_challenge, session):
     async with session.get(base_url, params=params, headers=headers) as response:
         if response.status == 200:
             page_view_id = response.headers.get("x-ms-gateway-requestid", "")
-            _LOGGER.info("GET request for authorization successful.")
+            _LOGGER.debug("GET request for authorization successful.")
             return page_view_id
         else:
             _LOGGER.error(
@@ -138,7 +138,7 @@ async def postLogin(
     url_with_params = f"{base_url}?{query_params}"
     async with session.post(url_with_params, headers=headers, data=data) as response:
         if response.status == 200:
-            _LOGGER.info("POST request for login successful.")
+            _LOGGER.debug("POST request for login successful.")
             return True
         else:
             _LOGGER.error(
@@ -210,7 +210,7 @@ async def postVerification(
     }
     async with session.post(url, headers=headers, data=data) as response:
         if response.status == 200:
-            _LOGGER.info("POST request for verification successful.")
+            _LOGGER.debug("POST request for verification successful.")
             return True
         else:
             _LOGGER.error(

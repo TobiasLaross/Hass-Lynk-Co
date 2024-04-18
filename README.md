@@ -60,7 +60,7 @@ This component offers various services to interact with your vehicle, including:
 - `lock_doors` / `unlock_doors`: Locks or unlocks the doors.
 - `start_flash_lights` / `stop_flash_lights`: Activates or deactivates hazard lights.
 - `start_engine` / `stop_engine`: Starts or stops the engine. (Note: This feature is experimental and undocumented by Lynk & Co.)
-- `manual_update_data`: Manually updates data from the vehicle.
+- `force_update_data`: Forcing update data from the vehicle, bypassing night limit.
 - `refresh_tokens`: Refreshes authentication tokens, this should not be needed, handled automatically.
 
 #### Detailed Service Information
