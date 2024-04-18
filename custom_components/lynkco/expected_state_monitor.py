@@ -72,9 +72,10 @@ class ExpectedStateMonitor:
 
     async def monitor_states(self, hass, entry):
         """Monitor expected states and update them continuously."""
+        poll_time = 3
         try:
             while True:
-                await asyncio.sleep(3)
+                await asyncio.sleep(poll_time)
                 await force_update_data(hass, entry)
                 coordinator = hass.data[DOMAIN][entry.entry_id][COORDINATOR]
 
@@ -82,6 +83,7 @@ class ExpectedStateMonitor:
                     current_states = coordinator.data
                     if self.check_and_update_states(current_states):
                         break
+                poll_time = min(15, poll_time + 2)
         finally:
             self.loop_running = False
 
