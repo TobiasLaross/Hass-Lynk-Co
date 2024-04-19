@@ -5,12 +5,18 @@ import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.data_entry_flow import FlowResult
 
-from .const import (CONFIG_2FA_KEY, CONFIG_EMAIL_KEY, CONFIG_EXPERIMENTAL_KEY,
-                    CONFIG_PASSWORD_KEY, CONFIG_SCAN_INTERVAL_KEY,
-                    CONFIG_VIN_KEY, DOMAIN, STORAGE_REFRESH_TOKEN_KEY)
+from .const import (
+    CONFIG_2FA_KEY,
+    CONFIG_EMAIL_KEY,
+    CONFIG_EXPERIMENTAL_KEY,
+    CONFIG_PASSWORD_KEY,
+    CONFIG_SCAN_INTERVAL_KEY,
+    CONFIG_VIN_KEY,
+    DOMAIN,
+    STORAGE_REFRESH_TOKEN_KEY,
+)
 from .login_flow import login, two_factor_authentication
-from .token_manager import (STORAGE_CCC_TOKEN_KEY, get_token_storage,
-                            send_device_login)
+from .token_manager import STORAGE_CCC_TOKEN_KEY, get_token_storage, send_device_login
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -175,11 +181,11 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                 vol.Required(
                     CONFIG_SCAN_INTERVAL_KEY,
                     default=self.config_entry.options.get(CONFIG_SCAN_INTERVAL_KEY, 60),
-                ): vol.All(vol.Coerce(int), vol.Range(min=5, max=240)),
+                ): vol.All(vol.Coerce(int), vol.Range(min=30, max=1440)),
             }
         )
 
-        # Display or redisplay the form with the current options as defaults
+        # Display or re-display the form with the current options as defaults
         return self.async_show_form(
             step_id="init",
             data_schema=data_schema,

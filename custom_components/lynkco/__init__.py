@@ -83,7 +83,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 async def options_update_listener(hass: HomeAssistant, entry: ConfigEntry):
     """Handle options update."""
 
-    update_interval_minutes = entry.options.get(CONFIG_SCAN_INTERVAL_KEY, 60)
+    update_interval_minutes = max(30, entry.options.get(CONFIG_SCAN_INTERVAL_KEY, 60))
 
     # Retrieve and update the coordinator's interval
     coordinator = hass.data[DOMAIN][entry.entry_id][COORDINATOR]
@@ -195,8 +195,8 @@ async def safely_remove_service(hass: HomeAssistant, domain: str, service: str):
 
 
 async def setup_data_coordinator(hass: HomeAssistant, entry: ConfigEntry):
-    update_interval_minutes = entry.options.get(CONFIG_SCAN_INTERVAL_KEY, 60)
-    _LOGGER.info(f"update: {update_interval_minutes}")
+    update_interval_minutes = max(30, entry.options.get(CONFIG_SCAN_INTERVAL_KEY, 60))
+    _LOGGER.debug(f"Will update every: {update_interval_minutes} min")
     """Setup the data update coordinator."""
     coordinator = DataUpdateCoordinator(
         hass,
@@ -204,7 +204,7 @@ async def setup_data_coordinator(hass: HomeAssistant, entry: ConfigEntry):
         name=f"{DOMAIN}_{entry.entry_id}_vehicle_data",
         update_method=lambda: update_data(hass, entry),
         update_interval=timedelta(minutes=update_interval_minutes),
-        request_refresh_debouncer=Debouncer(hass, _LOGGER, cooldown=5, immediate=True),
+        request_refresh_debouncer=Debouncer(hass, _LOGGER, cooldown=10, immediate=True),
     )
 
     if entry.entry_id in hass.data[DOMAIN]:

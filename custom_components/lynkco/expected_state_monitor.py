@@ -83,7 +83,7 @@ class ExpectedStateMonitor:
                     current_states = coordinator.data
                     if self.check_and_update_states(current_states):
                         break
-                poll_time = min(15, poll_time + 2)
+                poll_time = min(30, poll_time + 5)
         finally:
             self.loop_running = False
 

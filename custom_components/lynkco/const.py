@@ -6,7 +6,6 @@ STORAGE_CCC_TOKEN_KEY = "ccc_token"
 STORAGE_USER_ID_KEY = "user_id"
 STORAGE_REFRESH_TOKEN_KEY = "refresh_token"
 DATA_UPDATE_COORDINATOR = "data_update_coordinator"
-UPDATE_INTERVAL = 14400  # Update every 4 hours, expressed in seconds
 
 # Config keys
 CONFIG_EXPERIMENTAL_KEY = "experimental"
