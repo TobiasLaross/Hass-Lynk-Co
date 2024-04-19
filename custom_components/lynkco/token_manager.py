@@ -121,7 +121,7 @@ async def send_device_login(access_token: str):
         "X-Auth-Token": access_token,
         "api-version": "1",
     }
-    data = {"deviceUuid": uuid.uuid4(), "isLogin": True}
+    data = {"deviceUuid": str(uuid.uuid4()), "isLogin": True}
     async with aiohttp.ClientSession(
         connector=aiohttp.TCPConnector(ssl=False)
     ) as session:
