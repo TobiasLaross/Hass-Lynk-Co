@@ -1,2 +1,2 @@
-1.1.2
-Removed duplicate call for refresh token and added warning text at the top of readme
+1.1.3
+Increased debouncer time and increased the auto-updater timeout
