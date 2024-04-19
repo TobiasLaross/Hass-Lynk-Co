@@ -1,2 +1,2 @@
-1.1.3
-Increased debouncer time and increased the auto-updater timeout
+1.1.4
+Added random uuid for device id
