@@ -1,2 +1,2 @@
-1.1.1
-Increased time between polling for expected state
+1.1.2
+Removed duplicate call for refresh token and added warning text at the top of readme

@@ -5,12 +5,20 @@ import os
 import time
 
 import aiohttp
+from homeassistant.config_entries import asyncio
 from homeassistant.helpers.storage import Store
 
-from .const import (DOMAIN, STORAGE_CCC_TOKEN_KEY, STORAGE_REFRESH_TOKEN_KEY,
-                    STORAGE_TOKEN_KEY, STORAGE_USER_ID_KEY, STORAGE_VERSION)
+from .const import (
+    DOMAIN,
+    STORAGE_CCC_TOKEN_KEY,
+    STORAGE_REFRESH_TOKEN_KEY,
+    STORAGE_TOKEN_KEY,
+    STORAGE_USER_ID_KEY,
+    STORAGE_VERSION,
+)
 
 _LOGGER = logging.getLogger(__name__)
+ccc_token_lock = asyncio.Lock()
 
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))
 
@@ -33,11 +41,12 @@ async def is_token_expired(token):
 
 async def get_ccc_token(hass):
     """Retrieve the CCC token from file if is valid."""
-    token_storage = get_token_storage(hass)
-    tokens = await token_storage.async_load()
-    ccc_token = tokens.get(STORAGE_CCC_TOKEN_KEY)
-    if ccc_token is None or await is_token_expired(ccc_token):
-        ccc_token = await refresh_tokens(hass)
+    async with ccc_token_lock:
+        token_storage = get_token_storage(hass)
+        tokens = await token_storage.async_load()
+        ccc_token = tokens.get(STORAGE_CCC_TOKEN_KEY)
+        if ccc_token is None or await is_token_expired(ccc_token):
+            ccc_token = await refresh_tokens(hass)
     return ccc_token
 
 
