@@ -5,6 +5,7 @@ import os
 import time
 
 import aiohttp
+from homeassistant.auth.models import uuid
 from homeassistant.config_entries import asyncio
 from homeassistant.helpers.storage import Store
 
@@ -120,8 +121,7 @@ async def send_device_login(access_token: str):
         "X-Auth-Token": access_token,
         "api-version": "1",
     }
-    # Try to generate deviceUUid from setup once
-    data = {"deviceUuid": "1ef8a6ae-d219-4e2d-8d8e-18f4cdf81337", "isLogin": True}
+    data = {"deviceUuid": uuid.uuid4(), "isLogin": True}
     async with aiohttp.ClientSession(
         connector=aiohttp.TCPConnector(ssl=False)
     ) as session:

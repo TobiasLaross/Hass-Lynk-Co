@@ -5,7 +5,6 @@ from urllib.parse import quote_plus
 
 import pkce
 
-# TODO: Try new login flow
 _LOGGER = logging.getLogger(__name__)
 login_b2c_url = "https://login.lynkco.com/lynkcoprod.onmicrosoft.com/b2c_1a_signin_mfa/"
 client_id = "813902c0-0579-43f3-a767-6601c2f5fdbe"
@@ -162,8 +161,6 @@ async def getCombinedSigninAndSignup(
         "referer": f"{referer_base_url}?x-client-Ver=1.2.22&state=ABC&client_info=1&prompt=select_account&response_type=code&x-app-name=Lynk%20%26%20Co&code_challenge_method=S256&x-app-ver=2.12.0&scope=https%3A%2F%2Flynkcoprod.onmicrosoft.com%2Fmobile-app-web-api%2Fmobile.read%20https%3A%2F%2Flynkcoprod.onmicrosoft.com%2Fmobile-app-web-api%2Fmobile.write%20openid%20profile%20offline_access&x-client-SKU=MSAL.iOS&x-client-OS=17.4.1&code_challenge={code_challenge}&x-client-CPU=64&redirect_uri=msauth.com.lynkco.prod.lynkco-app%3A%2F%2Fauth&client-request-id=0207E18F-1598-4BD7-AC0F-705414D8B0F7&client_id={client_id}&x-client-DM=iPhone&return-client-request-id=true&haschrome=1",
         "accept-encoding": "gzip, deflate, br",
     }
-    # NDE0ODRGNTctM0VENi00NjBFLTlCQjItN0UyNjZBQTVEQjhB
-    # TODO: referer state could maybe be removed
     params = {
         "rememberMe": "false",
         "csrf_token": csrf_token,
