@@ -1,5 +1,7 @@
 # Lynk & Co Home Assistant Custom Component
 
+## :warning: **Warning**: Use of this integration with Lynk & Co's services might lead to your account being blocked. Use at your own risk.
+
 ## Introduction
 This custom component allows Home Assistant users to integrate and control their Lynk & Co vehicles directly from Home Assistant.
 It provides the functionality for multiple users to control pre climate and sensor monitoring.
