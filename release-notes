@@ -1,2 +1,2 @@
-1.1.5
-Fixed issue with login flow where UUID was not converted to string
+1.1.6
+Improved logging and error handling

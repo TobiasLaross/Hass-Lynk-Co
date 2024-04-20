@@ -132,7 +132,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     tokens = await token_storage.async_load() or {}
                     tokens[STORAGE_REFRESH_TOKEN_KEY] = refresh_token
                     ccc_token = await send_device_login(access_token)
-                    if ccc_token is not None:
+                    if ccc_token:
                         tokens[STORAGE_CCC_TOKEN_KEY] = ccc_token
                     else:
                         _LOGGER.error("New ccc token is none")
