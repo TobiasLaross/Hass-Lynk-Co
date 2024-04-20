@@ -62,15 +62,18 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         session = self.hass.helpers.aiohttp_client.async_get_clientsession()
 
         if user_input:
-            email = user_input.get("email", "")
-            password = user_input.get("password", "")
-            vin = user_input.get("vin", "")
+            email = user_input.get("email")
+            password = user_input.get("password")
+            vin = user_input.get("vin")
 
-            if not is_valid_email(email):
-                errors["email"] = "invalid_email"
+            if not email or not password or not vin:
+                errors["missing_details"] = "missing_details"
+            else:
+                if not is_valid_email(email):
+                    errors["email"] = "invalid_email"
 
-            if not is_valid_vin(vin):
-                errors["vin"] = "invalid_vin"
+                if not is_valid_vin(vin):
+                    errors["vin"] = "invalid_vin"
 
             if not errors:
                 (
@@ -158,6 +161,20 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="two_factor",
             data_schema=STEP_TWO_FA_DATA_SCHEMA,
             errors=errors,
+        )
+
+    async def async_step_reauth(self, user_input=None):
+        """Handle the re-authentication flow."""
+        if user_input is not None:
+            return await self.async_step_user(user_input)
+
+        return self.async_show_form(
+            step_id="reauth",
+            data_schema=STEP_USER_DATA_SCHEMA,
+            errors={},
+            description_placeholders={
+                "message": "Please re-enter your credentials to re-authenticate."
+            },
         )
 
 

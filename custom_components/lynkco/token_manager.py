@@ -7,6 +7,7 @@ import time
 import aiohttp
 from homeassistant.auth.models import uuid
 from homeassistant.config_entries import asyncio
+from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.storage import Store
 
 from .const import (
@@ -98,6 +99,9 @@ async def refresh_tokens(hass):
                     stored_tokens[STORAGE_REFRESH_TOKEN_KEY] = new_refresh_token
                 else:
                     _LOGGER.error("New refresh token is None")
+                    raise ConfigEntryAuthFailed(
+                        "Token has expired, please re-authenticate."
+                    )
                 access_token = tokens["access_token"]
                 if access_token:
                     ccc_token = await send_device_login(access_token)
@@ -105,7 +109,10 @@ async def refresh_tokens(hass):
                         _LOGGER.debug("Refreshed ccc token")
                         stored_tokens[STORAGE_CCC_TOKEN_KEY] = ccc_token
                     else:
-                        _LOGGER.error("New ccc token is None")
+                        _LOGGER.error("New ccc token is None, please re-authenticate")
+                        raise ConfigEntryAuthFailed(
+                            "Token has expired, please re-authenticate."
+                        )
                 else:
                     _LOGGER.error("Access token is None")
                     ccc_token = None

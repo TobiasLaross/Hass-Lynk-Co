@@ -16,6 +16,7 @@ from .const import (
     COORDINATOR,
     DATA_EXPECTED_STATE,
     DATA_IS_FORCE_UPDATE,
+    DATA_STORED_DATA,
     DOMAIN,
     EXPECTED_STATE_CLIMATE_OFF,
     EXPECTED_STATE_CLIMATE_ON,
@@ -66,6 +67,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     expected_state_monitor = ExpectedStateMonitor()
     hass.data[DOMAIN][entry.entry_id] = {
         DATA_IS_FORCE_UPDATE: False,
+        DATA_STORED_DATA: {},
         CONFIG_VIN_KEY: entry.data.get(CONFIG_VIN_KEY),
         DATA_EXPECTED_STATE: expected_state_monitor,
     }
@@ -222,15 +224,14 @@ async def update_data(hass: HomeAssistant, entry: ConfigEntry):
     vin = hass.data[DOMAIN][entry.entry_id][CONFIG_VIN_KEY]
     is_force_update = hass.data[DOMAIN][entry.entry_id][DATA_IS_FORCE_UPDATE]
     hass.data[DOMAIN][entry.entry_id][DATA_IS_FORCE_UPDATE] = False
-    failed_requests = 0
-    combined_data = {}
+    combined_data = hass.data[DOMAIN][entry.entry_id].get(DATA_STORED_DATA, {})
     if not vin:
         _LOGGER.error("Missing VIN for vehicle data update.")
         raise UpdateFailed("Missing VIN.")
     now = datetime.now()
     if not is_force_update and (1 <= now.hour <= 4):
         _LOGGER.info("Skipping automatic update due to time restrictions.")
-        return {}
+        return combined_data
 
     record, shadow = await asyncio.gather(
         async_fetch_vehicle_record_data(hass, vin),
@@ -239,9 +240,9 @@ async def update_data(hass: HomeAssistant, entry: ConfigEntry):
     )
     latitude = None
     longitude = None
-    if isinstance(record, Exception):
+    if isinstance(record, Exception) or not record:
         _LOGGER.error("Failed to fetch vehicle record data.")
-        failed_requests += 1
+        return combined_data
     else:
         combined_data["vehicle_record"] = record
         if isinstance(record, dict):
@@ -250,9 +251,9 @@ async def update_data(hass: HomeAssistant, entry: ConfigEntry):
                 latitude = position.get("latitude")
                 longitude = position.get("longitude")
 
-    if isinstance(shadow, Exception):
+    if isinstance(shadow, Exception) or not shadow:
         _LOGGER.error("Failed to fetch vehicle shadow data.")
-        failed_requests += 1
+        return combined_data
     else:
         combined_data["vehicle_shadow"] = shadow
 
@@ -270,11 +271,11 @@ async def update_data(hass: HomeAssistant, entry: ConfigEntry):
             address_raw = ", ".join(component["longName"] for component in address_data)
     else:
         address = "Unavailable"
-        failed_requests += 1
         _LOGGER.error("Latitude or longitude not available for address lookup.")
 
     combined_data["vehicle_address"] = address
     combined_data["vehicle_address_raw"] = address_raw
+    hass.data[DOMAIN][entry.entry_id][DATA_STORED_DATA] = combined_data
     return combined_data
 
 

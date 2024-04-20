@@ -18,6 +18,7 @@ CONFIG_2FA_KEY = "2fa"
 # Hass data constants
 DATA_EXPECTED_STATE = "expected_state_monitor"
 DATA_IS_FORCE_UPDATE = "is_force_update"
+DATA_STORED_DATA = "stored_data"
 
 # Service keys
 SERVICE_REFRESH_TOKENS_KEY = "refresh_tokens"

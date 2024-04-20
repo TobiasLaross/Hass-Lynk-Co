@@ -17,15 +17,22 @@
         "data": {
           "2fa": "Two-Factor Authentication Code"
         }
+      },
+      "reauth": {
+        "title": "Re-authentication Required",
+        "description": "Please re-enter your credentials to re-authenticate."
       }
     },
     "error": {
       "invalid_email": "The provided email is invalid. Please check and try again.",
       "invalid_vin": "The provided VIN is invalid. Please check and try again.",
-      "invalid_2fa_code": "The provided 2FA code is invalid. Please check and try again."
+      "invalid_2fa_code": "The provided 2FA code is invalid. Please check and try again.",
+      "login_failed": "Login failed. Please check your credentials and try again."
     },
     "abort": {
-      "unexpected_error": "An unexpected error occurred."
+      "unexpected_error": "An unexpected error occurred.",
+      "already_configured": "This device is already configured.",
+      "reauth_failed": "Re-authentication failed. Please try again."
     }
   },
   "options": {
@@ -34,9 +41,9 @@
         "title": "Lynk & Co Integration Settings",
         "description": "Configure your Lynk & Co integration settings.",
         "data": {
-          "experimental": "Experimental features (Not supported, see README)",
-          "refresh_interval": "At which interval to fetch car updates",
-          "scan_interval": "Scan Interval (min)"
+          "experimental": "Enable experimental features (use at your own risk)",
+          "scan_interval": "Scan Interval (minutes)",
+          "refresh_interval": "Refresh Interval (minutes) for fetching updates"
         }
       }
     }
