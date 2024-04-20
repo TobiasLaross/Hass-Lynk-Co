@@ -237,25 +237,24 @@ async def update_data(hass: HomeAssistant, entry: ConfigEntry):
         async_fetch_vehicle_shadow_data(hass, vin),
         return_exceptions=True,
     )
-
+    latitude = None
+    longitude = None
     if isinstance(record, Exception):
         _LOGGER.error("Failed to fetch vehicle record data.")
         failed_requests += 1
     else:
         combined_data["vehicle_record"] = record
+        if isinstance(record, dict):
+            position = record.get("position")
+            if isinstance(position, dict):
+                latitude = position.get("latitude")
+                longitude = position.get("longitude")
 
     if isinstance(shadow, Exception):
         _LOGGER.error("Failed to fetch vehicle shadow data.")
         failed_requests += 1
     else:
         combined_data["vehicle_shadow"] = shadow
-
-    latitude = (
-        combined_data.get("vehicle_record", {}).get("position", {}).get("latitude")
-    )
-    longitude = (
-        combined_data.get("vehicle_record", {}).get("position", {}).get("longitude")
-    )
 
     address_raw = "Unavailable"
     if latitude is not None and longitude is not None:

@@ -49,6 +49,6 @@ async def async_fetch_vehicle_data(hass, url):
                         f"Failed to fetch vehicle data, HTTP status: {response.status}, response: {await response.text()}"
                     )
                     return None
-    except Exception as e:
-        _LOGGER.error(f"Exception occurred while fetching vehicle data: {e}")
+    except Exception as error:
+        _LOGGER.error("Exception occurred while fetching vehicle data: %s", str(error))
         return None

@@ -93,17 +93,22 @@ async def refresh_tokens(hass):
                 tokens = await response.json()
                 stored_tokens = await token_storage.async_load()
                 new_refresh_token = tokens.get("refresh_token")
-                if new_refresh_token is not None:
+                if new_refresh_token:
                     _LOGGER.debug("Refreshed refresh token")
                     stored_tokens[STORAGE_REFRESH_TOKEN_KEY] = new_refresh_token
                 else:
                     _LOGGER.error("New refresh token is None")
-                ccc_token = await send_device_login(tokens["access_token"])
-                if ccc_token is not None:
-                    _LOGGER.debug("Refreshed ccc token")
-                    stored_tokens[STORAGE_CCC_TOKEN_KEY] = ccc_token
+                access_token = tokens["access_token"]
+                if access_token:
+                    ccc_token = await send_device_login(access_token)
+                    if ccc_token:
+                        _LOGGER.debug("Refreshed ccc token")
+                        stored_tokens[STORAGE_CCC_TOKEN_KEY] = ccc_token
+                    else:
+                        _LOGGER.error("New ccc token is None")
                 else:
-                    _LOGGER.error("New ccc token is None")
+                    _LOGGER.error("Access token is None")
+                    ccc_token = None
                 await token_storage.async_save(stored_tokens)
                 return ccc_token
             else:
