@@ -1,2 +1,2 @@
-1.2.0
-Added re-authentication flow
+1.2.1
+Increased default timeout for auto updater

@@ -197,8 +197,10 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                 ): bool,
                 vol.Required(
                     CONFIG_SCAN_INTERVAL_KEY,
-                    default=self.config_entry.options.get(CONFIG_SCAN_INTERVAL_KEY, 60),
-                ): vol.All(vol.Coerce(int), vol.Range(min=30, max=1440)),
+                    default=self.config_entry.options.get(
+                        CONFIG_SCAN_INTERVAL_KEY, 120
+                    ),
+                ): vol.All(vol.Coerce(int), vol.Range(min=60, max=1440)),
             }
         )
 

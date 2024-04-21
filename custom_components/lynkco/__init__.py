@@ -85,7 +85,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 async def options_update_listener(hass: HomeAssistant, entry: ConfigEntry):
     """Handle options update."""
 
-    update_interval_minutes = max(30, entry.options.get(CONFIG_SCAN_INTERVAL_KEY, 60))
+    update_interval_minutes = max(60, entry.options.get(CONFIG_SCAN_INTERVAL_KEY, 240))
+    _LOGGER.debug(f"Will update every: {update_interval_minutes} min")
 
     # Retrieve and update the coordinator's interval
     coordinator = hass.data[DOMAIN][entry.entry_id][COORDINATOR]
@@ -197,7 +198,7 @@ async def safely_remove_service(hass: HomeAssistant, domain: str, service: str):
 
 
 async def setup_data_coordinator(hass: HomeAssistant, entry: ConfigEntry):
-    update_interval_minutes = max(30, entry.options.get(CONFIG_SCAN_INTERVAL_KEY, 60))
+    update_interval_minutes = max(60, entry.options.get(CONFIG_SCAN_INTERVAL_KEY, 240))
     _LOGGER.debug(f"Will update every: {update_interval_minutes} min")
     """Setup the data update coordinator."""
     coordinator = DataUpdateCoordinator(

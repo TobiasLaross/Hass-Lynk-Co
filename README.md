@@ -53,6 +53,9 @@ Configure this integration through the Home Assistant UI.
 3. Follow the on-screen instructions to enter your vehicle details and complete the setup.
 
 ## Features and Usage
+The device will auto-update once every other hour by default and is configurable in the options flow to update between 1-24 hours per update.
+The system seem to be more stable with longer intervals, use force_update_data service to update when needed instead. The device will also
+update itself when expecting a new state after a service has been called.
 
 ### Services
 This component offers various services to interact with your vehicle, including:
