@@ -1,2 +1,2 @@
-1.2.1
-Increased default timeout for auto updater
+1.3.0
+Breaking changes: Improved naming of enum values for lynk_co_charger_connection_status and lynk_co_charge_state

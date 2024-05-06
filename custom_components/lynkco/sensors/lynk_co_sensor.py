@@ -16,6 +16,7 @@ class LynkCoSensor(CoordinatorEntity, Entity):
         name,
         data_path,
         unit_of_measurement=None,
+        state_mapping=None,
     ):
         super().__init__(coordinator)
         self.coordinator = coordinator
@@ -23,6 +24,7 @@ class LynkCoSensor(CoordinatorEntity, Entity):
         self._name = name
         self._data_path = data_path.split(".")
         self._unit_of_measurement = unit_of_measurement
+        self._state_mapping = state_mapping
 
     @property
     def name(self):
@@ -34,6 +36,8 @@ class LynkCoSensor(CoordinatorEntity, Entity):
         for key in self._data_path:
             if data:
                 data = data.get(key)
+        if self._state_mapping:
+            return self._state_mapping.get(data, data)
         return data
 
     @property
