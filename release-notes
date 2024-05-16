@@ -1,2 +1,3 @@
-1.3.1
-Fixed handling of re-authentication in UI when update_data fails due to token not valid
+1.4.0
+Added option to set dark hours where automatic updates should be disabled.
+Minor improvements to README.

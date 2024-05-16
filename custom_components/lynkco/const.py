@@ -8,12 +8,14 @@ STORAGE_REFRESH_TOKEN_KEY = "refresh_token"
 DATA_UPDATE_COORDINATOR = "data_update_coordinator"
 
 # Config keys
-CONFIG_EXPERIMENTAL_KEY = "experimental"
-CONFIG_SCAN_INTERVAL_KEY = "scan_interval"
 CONFIG_VIN_KEY = "vin"
 CONFIG_EMAIL_KEY = "email"
 CONFIG_PASSWORD_KEY = "password"
 CONFIG_2FA_KEY = "2fa"
+CONFIG_EXPERIMENTAL_KEY = "experimental"
+CONFIG_SCAN_INTERVAL_KEY = "scan_interval"
+CONFIG_DARK_HOURS_START = "dark_hours_start"
+CONFIG_DARK_HOURS_END = "dark_hours_end"
 
 # Hass data constants
 DATA_EXPECTED_STATE = "expected_state_monitor"

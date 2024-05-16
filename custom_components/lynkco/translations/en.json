@@ -41,9 +41,10 @@
         "title": "Lynk & Co Integration Settings",
         "description": "Configure your Lynk & Co integration settings.",
         "data": {
-          "experimental": "Enable experimental features (use at your own risk)",
+          "experimental": "Enable experimental features (use at your own risk, see README)",
           "scan_interval": "Scan Interval (minutes)",
-          "refresh_interval": "Refresh Interval (minutes) for fetching updates"
+          "dark_hours_start": "Start of dark hours interval (not automatic updates during interval)",
+          "dark_hours_end": "End of dark hours interval (not automatic updates during interval)"
         }
       }
     }
