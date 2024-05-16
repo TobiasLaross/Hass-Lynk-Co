@@ -70,7 +70,7 @@ async def refresh_tokens(hass):
     refresh_token = tokens.get(STORAGE_REFRESH_TOKEN_KEY)
     if refresh_token is None:
         _LOGGER.error("Refresh token is None, re-authenticate")
-        return
+        raise ConfigEntryAuthFailed("Token has expired, please re-authenticate.")
     headers = {
         "user-agent": "LynkCo/3016 CFNetwork/1492.0.1 Darwin/23.3.0",
         "accept": "application/json",
