@@ -64,8 +64,8 @@ Options can be configured through the Options Flow in the Home Assistant UI:
    - Set the start and end times for "dark hours" to limit automatic data updates during certain hours.
 
 ## Features and Usage
-The device will auto-update once every other hour by default and is configurable in the options flow to update between 1-24 hours per update.
-The system seem to be more stable with longer intervals, use force_update_data service to update when needed instead. The device will also
+The device will auto-update once every other hour by default and is configurable in the options flow to update every 1-24 hours.
+The system seems to be more stable with longer intervals, use force_update_data service to update when needed instead. The device will also
 update itself when expecting a new state after a service has been called.
 
 ### Services
