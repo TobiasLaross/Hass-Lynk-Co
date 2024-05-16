@@ -40,7 +40,7 @@ jobs:
       - name: Read release notes
         id: release-notes
         run: |
-          BODY=$(tail -n +2 release-notes)
+          BODY=$(tail -n +2 release-notes | tr '\n' ' ')
           echo "::set-output name=body::$BODY"
 
       - name: Create GitHub Release

@@ -16,6 +16,7 @@ This has been tested on european models only.
   - [Installing the Integration](#installing-the-integration)
 - [Configuration](#configuration)
   - [Initial Setup](#initial-setup)
+  - [Options Flow](#options-flow)
 - [Features and Usage](#features-and-usage)
   - [Services](#services)
   - [Entities](#entities)
@@ -52,9 +53,19 @@ Configure this integration through the Home Assistant UI.
 2. Click on "Add Integration" and search for "Lynk & Co".
 3. Follow the on-screen instructions to enter your vehicle details and complete the setup.
 
+### Options Flow
+Options can be configured through the Options Flow in the Home Assistant UI:
+
+1. Navigate to Configuration > Integrations.
+2. Find the Lynk & Co integration and click "Configure".
+3. Adjust settings such as scan interval and experimental features:
+   - Enable or disable experimental features.
+   - Configure the scan interval (in minutes) to control how frequently your vehicle's data is updated.
+   - Set the start and end times for "dark hours" to limit automatic data updates during certain hours.
+
 ## Features and Usage
-The device will auto-update once every other hour by default and is configurable in the options flow to update between 1-24 hours per update.
-The system seem to be more stable with longer intervals, use force_update_data service to update when needed instead. The device will also
+The device will auto-update once every other hour by default and is configurable in the options flow to update every 1-24 hours.
+The system seems to be more stable with longer intervals, use force_update_data service to update when needed instead. The device will also
 update itself when expecting a new state after a service has been called.
 
 ### Services
@@ -62,14 +73,15 @@ This component offers various services to interact with your vehicle, including:
 - `start_climate` / `stop_climate`: Starts or stops the climate control system.
 - `lock_doors` / `unlock_doors`: Locks or unlocks the doors.
 - `start_flash_lights` / `stop_flash_lights`: Activates or deactivates hazard lights.
-- `start_engine` / `stop_engine`: Starts or stops the engine. (Note: This feature is experimental and undocumented by Lynk & Co.)
+- `start_engine` / `stop_engine`: Starts or stops the engine. (Note: This feature is experimental and is not documented by Lynk & Co.)
 - `force_update_data`: Forcing update data from the vehicle, bypassing night limit.
 - `refresh_tokens`: Refreshes authentication tokens, this should not be needed, handled automatically.
 
 #### Detailed Service Information
 
 - **start_engine / stop_engine**: This service allows you to remotely start or stop your vehicle's engine. It's an experimental feature not officially supported by the Lynk & Co app.
-Use with caution, as it may not always perform as expected. My observations are that the EV engine will be started and climate will be set to HI, this service have not been tested without sufficient EV battery.
+Use with caution, as it may not always perform as expected. My observations are that the EV engine will be started and climate will be set to your latest configuration in the car.
+This has not been tested without sufficient EV battery.
 
 ### Entities
 The integration creates entities for comprehensive monitoring and control of the Lynk & Co vehicle, including both sensors and binary sensors.
@@ -97,7 +109,7 @@ Sensors provide detailed information about various aspects of the vehicle's stat
 Binary sensors indicate specific vehicle states that have a true or false condition. These include:
 
 - **Pre Climate Active**: Indicates whether the pre-climate control system is active, ensuring the vehicle's interior is at a comfortable temperature before you enter. It uses the icon `mdi:air-conditioner` to visually represent this feature in the Home Assistant UI.
-- **Vehicle is Running**: Shows if the vehicle's engine is currently running. This sensor is crucial for understanding the immediate operational state of your vehicle and uses the `mdi:engine` icon for easy identification.
+- **Vehicle is Running**: Shows if the vehicle's engine is currently running. This sensor is on if car is running either normally or by start engine service.
 
 For a comprehensive list of all entities, including detailed descriptions and additional sensors, please refer to [Detailed Entities Information](entities.md).
 

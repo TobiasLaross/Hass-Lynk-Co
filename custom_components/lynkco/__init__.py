@@ -10,6 +10,8 @@ from homeassistant.helpers.debounce import Debouncer
 from .expected_state_monitor import ExpectedStateMonitor
 
 from .const import (
+    CONFIG_DARK_HOURS_END,
+    CONFIG_DARK_HOURS_START,
     CONFIG_EXPERIMENTAL_KEY,
     CONFIG_SCAN_INTERVAL_KEY,
     CONFIG_VIN_KEY,
@@ -226,12 +228,22 @@ async def update_data(hass: HomeAssistant, entry: ConfigEntry):
     is_force_update = hass.data[DOMAIN][entry.entry_id][DATA_IS_FORCE_UPDATE]
     hass.data[DOMAIN][entry.entry_id][DATA_IS_FORCE_UPDATE] = False
     combined_data = hass.data[DOMAIN][entry.entry_id].get(DATA_STORED_DATA, {})
+    dark_hours_start = max(23, entry.options.get(CONFIG_DARK_HOURS_START, 1))
+    dark_hours_end = max(23, entry.options.get(CONFIG_DARK_HOURS_END, 4))
     if not vin:
         _LOGGER.error("Missing VIN for vehicle data update.")
         raise UpdateFailed("Missing VIN.")
     now = datetime.now()
-    if not is_force_update and (1 <= now.hour <= 4):
-        _LOGGER.info("Skipping automatic update due to time restrictions.")
+    is_interval_spanning_two_days = dark_hours_end < dark_hours_start
+    is_current_time_in_dark_hours = (
+        is_interval_spanning_two_days
+        and (now.hour >= dark_hours_start or now.hour < dark_hours_end)
+    ) or (
+        not is_interval_spanning_two_days
+        and dark_hours_start <= now.hour < dark_hours_end
+    )
+    if not is_force_update and (is_current_time_in_dark_hours):
+        _LOGGER.debug("Skipping automatic update due to time restrictions.")
         return combined_data
 
     record, shadow = await asyncio.gather(

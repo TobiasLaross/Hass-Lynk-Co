@@ -7,6 +7,8 @@ from homeassistant.data_entry_flow import FlowResult
 
 from .const import (
     CONFIG_2FA_KEY,
+    CONFIG_DARK_HOURS_END,
+    CONFIG_DARK_HOURS_START,
     CONFIG_EMAIL_KEY,
     CONFIG_EXPERIMENTAL_KEY,
     CONFIG_PASSWORD_KEY,
@@ -201,6 +203,14 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                         CONFIG_SCAN_INTERVAL_KEY, 120
                     ),
                 ): vol.All(vol.Coerce(int), vol.Range(min=60, max=1440)),
+                vol.Required(
+                    CONFIG_DARK_HOURS_START,
+                    default=self.config_entry.options.get(CONFIG_DARK_HOURS_START, 1),
+                ): vol.All(vol.Coerce(int), vol.Range(min=0, max=23)),
+                vol.Required(
+                    CONFIG_DARK_HOURS_END,
+                    default=self.config_entry.options.get(CONFIG_DARK_HOURS_END, 5),
+                ): vol.All(vol.Coerce(int), vol.Range(min=0, max=23)),
             }
         )
 
