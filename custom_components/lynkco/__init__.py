@@ -237,11 +237,11 @@ async def update_data(hass: HomeAssistant, entry: ConfigEntry):
     record, shadow = await asyncio.gather(
         async_fetch_vehicle_record_data(hass, vin),
         async_fetch_vehicle_shadow_data(hass, vin),
-        return_exceptions=True,
     )
     latitude = None
     longitude = None
-    if isinstance(record, Exception) or not record:
+
+    if not record:
         _LOGGER.error("Failed to fetch vehicle record data.")
         return combined_data
     else:
@@ -252,7 +252,7 @@ async def update_data(hass: HomeAssistant, entry: ConfigEntry):
                 latitude = position.get("latitude")
                 longitude = position.get("longitude")
 
-    if isinstance(shadow, Exception) or not shadow:
+    if not shadow:
         _LOGGER.error("Failed to fetch vehicle shadow data.")
         return combined_data
     else:
