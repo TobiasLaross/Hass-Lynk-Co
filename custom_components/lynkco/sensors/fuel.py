@@ -49,5 +49,11 @@ def create_sensors(coordinator, vin):
             "vehicle_record.fuel.averageConsumptionLatestDrivingCycle",
             "L/100km",
         ),
+        LynkCoSensor(
+            coordinator,
+            vin,
+            "Lynk & Co Tank Flap Status",
+            "vehicle_shadow.vls.tankFlapStatus",
+        ),
     ]
     return sensors
