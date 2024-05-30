@@ -1,2 +1,2 @@
-1.5.0
-Added new services: start_honk, start_honk_flash & stop_honk
+1.6.0
+Added a lot of new sensors, such as windows, tyre, seatbelt & bulbs among others.
