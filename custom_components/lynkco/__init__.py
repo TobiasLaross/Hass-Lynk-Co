@@ -32,9 +32,12 @@ from .const import (
     SERVICE_START_CLIMATE_KEY,
     SERVICE_START_ENGINE_KEY,
     SERVICE_START_FLASHLIGHT_KEY,
+    SERVICE_START_HONK_FLASH_KEY,
+    SERVICE_START_HONK_KEY,
     SERVICE_STOP_CLIMATE_KEY,
     SERVICE_STOP_ENGINE_KEY,
     SERVICE_STOP_FLASHLIGHT_KEY,
+    SERVICE_STOP_HONK_KEY,
     SERVICE_UNLOCK_DOORS_KEY,
 )
 from .data_fetcher import (
@@ -47,9 +50,12 @@ from .remote_control_manager import (
     start_climate,
     start_engine,
     start_flash_lights,
+    stop_flash_lights,
+    start_honk,
+    start_honk_flash,
+    stop_honk,
     stop_climate,
     stop_engine,
-    stop_flash_lights,
     unlock_doors,
     force_update_data,
 )
@@ -142,6 +148,15 @@ async def register_services(hass: HomeAssistant, entry: ConfigEntry):
     async def stop_flash_lights_service(call):
         await stop_flash_lights(hass, vin)
 
+    async def start_honk_service(call):
+        await start_honk(hass, vin)
+
+    async def start_honk_flash_service(call):
+        await start_honk_flash(hass, vin)
+
+    async def stop_honk_service(call):
+        await stop_honk(hass, vin)
+
     async def force_update_data_service(call):
         await force_update_data(hass, entry)
 
@@ -171,6 +186,11 @@ async def register_services(hass: HomeAssistant, entry: ConfigEntry):
     hass.services.async_register(
         DOMAIN, SERVICE_STOP_FLASHLIGHT_KEY, stop_flash_lights_service
     )
+    hass.services.async_register(DOMAIN, SERVICE_START_HONK_KEY, start_honk_service)
+    hass.services.async_register(
+        DOMAIN, SERVICE_START_HONK_FLASH_KEY, start_honk_flash_service
+    )
+    hass.services.async_register(DOMAIN, SERVICE_STOP_HONK_KEY, stop_honk_service)
     hass.services.async_register(
         DOMAIN, SERVICE_FORCE_UPDATE_KEY, force_update_data_service
     )
