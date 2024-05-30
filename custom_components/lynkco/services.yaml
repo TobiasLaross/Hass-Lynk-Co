@@ -52,6 +52,18 @@ stop_flash_lights:
   name: Stop Flash Lights
   description: Stops the turn signals of the car
 
+start_honk:
+  name: Start Honking
+  description: Make the car honk
+
+stop_honk:
+  name: Stop Honking
+  description: Stops the honk
+
+start_honk_flash:
+  name: Start Honking and start flashing
+  description: Make the car honk and start flashing
+
 start_engine:
   name: Start engine
   description: Starts the engine, this is an undocumented feature, see README for details

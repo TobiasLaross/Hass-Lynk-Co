@@ -1,3 +1,2 @@
-1.4.0
-Added option to set dark hours where automatic updates should be disabled.
-Minor improvements to README.
+1.5.0
+Added new services: start_honk, start_honk_flash & stop_honk

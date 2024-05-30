@@ -73,6 +73,8 @@ This component offers various services to interact with your vehicle, including:
 - `start_climate` / `stop_climate`: Starts or stops the climate control system.
 - `lock_doors` / `unlock_doors`: Locks or unlocks the doors.
 - `start_flash_lights` / `stop_flash_lights`: Activates or deactivates hazard lights.
+- `start_honk` / `stop_honk`: Activates or deactivates honk.
+- `start_honk_flash`: Activates honk and hazard lights.
 - `start_engine` / `stop_engine`: Starts or stops the engine. (Note: This feature is experimental and is not documented by Lynk & Co.)
 - `force_update_data`: Forcing update data from the vehicle, bypassing night limit.
 - `refresh_tokens`: Refreshes authentication tokens, this should not be needed, handled automatically.

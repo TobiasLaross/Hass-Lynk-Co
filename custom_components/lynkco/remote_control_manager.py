@@ -158,6 +158,34 @@ async def start_flash_lights(hass, vin):
         _LOGGER.info("Successfully sent start flash to Lynk backend")
 
 
+async def start_honk(hass, vin):
+    data = {
+        "command": "START",
+        "control": "HONK",
+    }
+    if await make_http_request(
+        hass,
+        f"https://remote-vehicle-control-tls.aion.connectedcar.cloud/api/v1/rvc/vehicles/{vin}/remotecontrol/honkflash",
+        data,
+        vin,
+    ):
+        _LOGGER.info("Successfully sent start honk to Lynk backend")
+
+
+async def start_honk_flash(hass, vin):
+    data = {
+        "command": "START",
+        "control": "HONK_FLASH",
+    }
+    if await make_http_request(
+        hass,
+        f"https://remote-vehicle-control-tls.aion.connectedcar.cloud/api/v1/rvc/vehicles/{vin}/remotecontrol/honkflash",
+        data,
+        vin,
+    ):
+        _LOGGER.info("Successfully sent start honk and flash to Lynk backend")
+
+
 async def stop_flash_lights(hass, vin):
     data = {
         "command": "STOP",
@@ -170,6 +198,20 @@ async def stop_flash_lights(hass, vin):
         vin,
     ):
         _LOGGER.info("Successfully sent stop flash to Lynk backend")
+
+
+async def stop_honk(hass, vin):
+    data = {
+        "command": "STOP",
+        "control": "HONK",
+    }
+    if await make_http_request(
+        hass,
+        f"https://remote-vehicle-control-tls.aion.connectedcar.cloud/api/v1/rvc/vehicles/{vin}/remotecontrol/honkflash",
+        data,
+        vin,
+    ):
+        _LOGGER.info("Successfully sent stop honk to Lynk backend")
 
 
 async def force_update_data(hass, entry):
