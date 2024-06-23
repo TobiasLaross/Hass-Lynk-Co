@@ -175,22 +175,35 @@ async def getCombinedSigninAndSignup(
         ),
     }
 
-    async with session.get(url, params=params, headers=headers) as response:
-        if response.status == 200:
-            new_page_view_id = response.headers.get("x-ms-gateway-requestid")
-            if new_page_view_id:
-                constructed_url = f"{url}?{'&'.join([f'{key}={value}' for key, value in params.items() if key != 'diags'])}"
-                diags_dict = json.loads(params["diags"])
-                encoded_diags = quote_plus(json.dumps(diags_dict))
-                constructed_url_with_diags = f"{constructed_url}&diags={encoded_diags}"
-                return new_page_view_id, constructed_url_with_diags
+    try:
+        async with session.get(url, params=params, headers=headers) as response:
+            if response.status == 200:
+                new_page_view_id = response.headers.get("x-ms-gateway-requestid")
+                if new_page_view_id:
+                    constructed_url = f"{url}?{'&'.join([f'{key}={value}' for key, value in params.items() if key != 'diags'])}"
+                    diags_dict = json.loads(params["diags"])
+                    encoded_diags = quote_plus(json.dumps(diags_dict))
+                    constructed_url_with_diags = (
+                        f"{constructed_url}&diags={encoded_diags}"
+                    )
+                    return new_page_view_id, constructed_url_with_diags
+                else:
+                    _LOGGER.error("New pageViewId not found in the response headers.")
+                    return None, None
             else:
-                _LOGGER.error("New pageViewId not found in the response headers.")
-                return None, None
-        else:
-            _LOGGER.error(
-                f"GET request for CombinedSigninAndSignup failed with status code: {response.status}"
-            )
+                _LOGGER.error(
+                    f"GET request for CombinedSigninAndSignup failed with status code: {response.status}"
+                )
+    except ValueError as e:
+        _LOGGER.error(f"ValueError during HTTP request: {e}")
+        _LOGGER.info(
+            f"Parameters passed: csrf_token={csrf_token}, tx_value={tx_value}, page_view_id={page_view_id}, code_challenge={code_challenge}, session={session}"
+        )
+    except Exception as e:
+        _LOGGER.error(f"Unexpected error during HTTP request: {e}", exc_info=True)
+        _LOGGER.info(
+            f"Parameters passed: csrf_token={csrf_token}, tx_value={tx_value}, page_view_id={page_view_id}, code_challenge={code_challenge}, session={session}"
+        )
     return None, None
 
 
