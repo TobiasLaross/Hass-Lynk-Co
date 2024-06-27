@@ -4,6 +4,7 @@ import re
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.data_entry_flow import FlowResult
+from homeassistant.helpers import config_validation as config_validation
 
 from .const import (
     CONFIG_2FA_KEY,
@@ -21,6 +22,10 @@ from .login_flow import login, two_factor_authentication
 from .token_manager import STORAGE_CCC_TOKEN_KEY, get_token_storage, send_device_login
 
 _LOGGER = logging.getLogger(__name__)
+
+CONFIG_SCHEMA = vol.Schema(
+    {DOMAIN: config_validation.empty_config_schema(DOMAIN)}, extra=vol.ALLOW_EXTRA
+)
 
 STEP_USER_DATA_SCHEMA = vol.Schema(
     {
