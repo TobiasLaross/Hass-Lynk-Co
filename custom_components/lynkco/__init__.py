@@ -1,11 +1,13 @@
 import asyncio
 import logging
-from datetime import datetime, timedelta
+import voluptuous as vol
 
+from datetime import datetime, timedelta
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.helpers.debounce import Debouncer
+from homeassistant.helpers import config_validation as config_validation
 
 from .expected_state_monitor import ExpectedStateMonitor
 
@@ -62,6 +64,9 @@ from .remote_control_manager import (
 from .token_manager import refresh_tokens
 
 _LOGGER = logging.getLogger(__name__)
+CONFIG_SCHEMA = vol.Schema(
+    {DOMAIN: config_validation.empty_config_schema(DOMAIN)}, extra=vol.ALLOW_EXTRA
+)
 
 
 async def async_setup(hass: HomeAssistant, config: dict):
