@@ -1,6 +1,7 @@
 import logging
 
 from homeassistant.components.lock import LockEntity
+from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import COORDINATOR, DOMAIN
@@ -35,6 +36,12 @@ class LynkCoLock(CoordinatorEntity, LockEntity):
         self._state = None
         self._car_updated_at_path = (
             car_updated_at.split(".") if car_updated_at else None
+        )
+
+        self._attr_device_info = DeviceInfo(
+            identifiers={(DOMAIN, f"lynk_co_{self._vin}")},
+            manufacturer="Lynk & Co",
+            name=f"Lynk & Co {self._vin}",
         )
 
     @property
@@ -92,11 +99,3 @@ class LynkCoLock(CoordinatorEntity, LockEntity):
             if data:
                 attributes["car_updated_at"] = data
         return attributes
-
-    @property
-    def device_info(self):
-        return {
-            "identifiers": {(DOMAIN, f"lynk_co_{self._vin}")},
-            "name": f"Lynk & Co {self._vin}",
-            "manufacturer": "Lynk & Co",
-        }

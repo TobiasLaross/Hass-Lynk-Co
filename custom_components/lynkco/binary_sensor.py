@@ -2,6 +2,7 @@ import logging
 
 from homeassistant.components.binary_sensor import BinarySensorEntity
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from homeassistant.helpers.entity import DeviceInfo
 
 from .const import COORDINATOR, DOMAIN
 
@@ -58,7 +59,12 @@ class LynkCoBinarySensor(CoordinatorEntity, BinarySensorEntity):
         )
         self._device_class = device_class
         self._icon = icon
-        self._state = None
+
+        self._attr_device_info = DeviceInfo(
+            identifiers={(DOMAIN, f"lynk_co_{self._vin}")},
+            manufacturer="Lynk & Co",
+            name=f"Lynk & Co {self._vin}",
+        )
 
     @property
     def name(self):
@@ -106,14 +112,6 @@ class LynkCoBinarySensor(CoordinatorEntity, BinarySensorEntity):
     @property
     def icon(self):
         return self._icon
-
-    @property
-    def device_info(self):
-        return {
-            "identifiers": {(DOMAIN, f"lynk_co_{self._vin}")},
-            "name": f"Lynk & Co {self._vin}",
-            "manufacturer": "Lynk & Co",
-        }
 
     @property
     def unique_id(self):

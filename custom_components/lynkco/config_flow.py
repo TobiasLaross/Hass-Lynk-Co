@@ -4,6 +4,7 @@ import re
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.data_entry_flow import FlowResult
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .const import (
     CONFIG_2FA_KEY,
@@ -61,7 +62,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_user(self, user_input=None):
         """Handle a flow initialized by the user."""
         errors = {}
-        session = self.hass.helpers.aiohttp_client.async_get_clientsession()
+        session = async_get_clientsession(self.hass)
 
         if user_input:
             email = user_input.get("email")
@@ -115,7 +116,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_two_factor(self, user_input=None):
         """Handle the second step for inputting the 2FA code."""
         errors = {}
-        session = self.hass.helpers.aiohttp_client.async_get_clientsession()
+        session = async_get_clientsession(self.hass)
 
         if user_input is not None:
             two_fa_code = user_input.get("2fa")
@@ -143,13 +144,25 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                         _LOGGER.error("New ccc token is none")
                     await token_storage.async_save(tokens)
                     vin = self.context.get("vin", "")
-                    return self.async_create_entry(
-                        title="Lynk & Co",
-                        data={"vin": vin},
-                        description_placeholders={
-                            "additional_configuration": "Please use the configuration to enable experimental features."
-                        },
-                    )
+                    if hasattr(self, "_reauth_entry"):
+                        # Update the existing config entry
+                        self.hass.config_entries.async_update_entry(
+                            self._reauth_entry,
+                            data={"vin": vin},
+                        )
+                        await self.hass.config_entries.async_reload(
+                            self._reauth_entry.entry_id
+                        )
+                        return self.async_abort(reason="reauth_successful")
+                    else:
+                        # Create new entry
+                        return self.async_create_entry(
+                            title="Lynk & Co",
+                            data={"vin": vin},
+                            description_placeholders={
+                                "additional_configuration": "Please use the configuration to enable experimental features."
+                            },
+                        )
                 else:
                     errors["base"] = "invalid_2fa_code"
             except Exception as e:
@@ -167,6 +180,10 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_reauth(self, user_input=None):
         """Handle the re-authentication flow."""
+        self._reauth_entry = self.hass.config_entries.async_get_entry(
+            self.context["entry_id"]
+        )
+
         if user_input is not None:
             return await self.async_step_user(user_input)
 

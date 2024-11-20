@@ -5,8 +5,13 @@ import voluptuous as vol
 from datetime import datetime, timedelta
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.helpers.debounce import Debouncer
+from homeassistant.helpers.device_registry import DeviceEntry
+from homeassistant.helpers.entity_registry import (
+    async_entries_for_device,
+    async_get as async_get_entity_registry,
+)
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.helpers import config_validation as config_validation
 
 from .expected_state_monitor import ExpectedStateMonitor
@@ -76,7 +81,14 @@ async def async_setup(hass: HomeAssistant, config: dict):
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Set up a configuration entry."""
-    hass.data.setdefault(DOMAIN, {})
+    if DOMAIN not in hass.data:
+        hass.data[DOMAIN] = {}
+
+    if entry.entry_id in hass.data[DOMAIN]:
+        # The entry is already set up; possibly due to re-authentication or reload
+        _LOGGER.debug(f"Entry {entry.entry_id} is already set up.")
+        return True
+
     expected_state_monitor = ExpectedStateMonitor()
     hass.data[DOMAIN][entry.entry_id] = {
         DATA_IS_FORCE_UPDATE: False,
@@ -88,7 +100,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     _LOGGER.debug(f"Experimental: {entry.options.get(CONFIG_EXPERIMENTAL_KEY, False)}")
     await setup_data_coordinator(hass, entry)
 
-    entry.add_update_listener(options_update_listener)
+    entry.async_on_unload(entry.add_update_listener(options_update_listener))
     await register_services(hass, entry)
     await setup_platforms(hass, entry)
 
@@ -253,8 +265,8 @@ async def update_data(hass: HomeAssistant, entry: ConfigEntry):
     is_force_update = hass.data[DOMAIN][entry.entry_id][DATA_IS_FORCE_UPDATE]
     hass.data[DOMAIN][entry.entry_id][DATA_IS_FORCE_UPDATE] = False
     combined_data = hass.data[DOMAIN][entry.entry_id].get(DATA_STORED_DATA, {})
-    dark_hours_start = max(23, entry.options.get(CONFIG_DARK_HOURS_START, 1))
-    dark_hours_end = max(23, entry.options.get(CONFIG_DARK_HOURS_END, 4))
+    dark_hours_start = int(entry.options.get(CONFIG_DARK_HOURS_START, 1))
+    dark_hours_end = int(entry.options.get(CONFIG_DARK_HOURS_END, 4))
     if not vin:
         _LOGGER.error("Missing VIN for vehicle data update.")
         raise UpdateFailed("Missing VIN.")
@@ -348,9 +360,46 @@ def parse_address(address_response):
     return formatted_address
 
 
+async def async_remove_config_entry_device(
+    hass: HomeAssistant, config_entry: ConfigEntry, device_entry: DeviceEntry
+) -> bool:
+    """Determine if the device can be safely removed."""
+    entity_registry = async_get_entity_registry(hass)
+
+    # Get all entities associated with this device
+    entries = async_entries_for_device(
+        entity_registry, device_entry.id, include_disabled_entities=True
+    )
+
+    # Filter entities that belong to this config entry
+    entries = [
+        entry for entry in entries if entry.config_entry_id == config_entry.entry_id
+    ]
+
+    if entries:
+        _LOGGER.debug(
+            f"Cannot remove device {device_entry.id} because it has entities: {entries}"
+        )
+        return False
+
+    _LOGGER.debug(f"Device {device_entry.id} can be safely removed")
+    return True
+
+
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
+    """Unload a configuration entry."""
+    platforms = ["sensor", "binary_sensor", "lock", "device_tracker"]
+    unload_ok = await hass.config_entries.async_unload_platforms(entry, platforms)
+    if unload_ok:
+        # Clean up integration data
+        hass.data[DOMAIN].pop(entry.entry_id)
+        _LOGGER.debug(f"Unloaded entry {entry.entry_id}")
+    else:
+        _LOGGER.error(f"Failed to unload entry {entry.entry_id}")
+    return unload_ok
+
+
 async def setup_platforms(hass: HomeAssistant, entry: ConfigEntry):
     """Setup platforms like sensor, lock, etc."""
-    for platform in ["sensor", "binary_sensor", "lock", "device_tracker"]:
-        hass.async_create_task(
-            hass.config_entries.async_forward_entry_setup(entry, platform)
-        )
+    platforms = ["sensor", "binary_sensor", "lock", "device_tracker"]
+    await hass.config_entries.async_forward_entry_setups(entry, platforms)

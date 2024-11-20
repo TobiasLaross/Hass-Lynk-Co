@@ -1,2 +1,3 @@
-1.7.0
-Release for HACS default repo
+1.8.0
+The integration should no longer setup a new device when re-authenticating and dark hours should work as expected. Also removed usage of deprecated functions.
+Fixed issues #38, #43 #47 and #51.
