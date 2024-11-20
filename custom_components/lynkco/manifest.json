@@ -12,6 +12,5 @@
         "requests>=2.31.0",
         "pkce>=1.0.3"
     ],
-    "version": "1.8.0",
-    "supports_unload": true
+    "version": "1.8.0"
 }
