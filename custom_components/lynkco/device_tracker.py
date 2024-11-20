@@ -2,6 +2,7 @@ import logging
 
 from homeassistant.components.device_tracker import SourceType
 from homeassistant.components.device_tracker.config_entry import TrackerEntity
+from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import COORDINATOR, DOMAIN
@@ -24,6 +25,12 @@ class LynkCoDeviceTracker(CoordinatorEntity, TrackerEntity):
         self._data_path_lat = "vehicle_record.position.latitude".split(".")
         self._attr_unique_id = f"{DOMAIN}_{self._vin}_location"
         self._attr_name = "Lynk & Co Vehicle Tracker"
+
+        self._attr_device_info = DeviceInfo(
+            identifiers={(DOMAIN, f"lynk_co_{self._vin}")},
+            manufacturer="Lynk & Co",
+            name=f"Lynk & Co {self._vin}",
+        )
 
     @property
     def latitude(self):
@@ -50,14 +57,6 @@ class LynkCoDeviceTracker(CoordinatorEntity, TrackerEntity):
     def available(self):
         # Check if both latitude and longitude data are not None
         return self.latitude is not None and self.longitude is not None
-
-    @property
-    def device_info(self):
-        return {
-            "identifiers": {(DOMAIN, f"lynk_co_{self._vin}")},
-            "name": f"Lynk & Co {self._vin}",
-            "manufacturer": "Lynk & Co",
-        }
 
     @property
     def unique_id(self):
