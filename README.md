@@ -83,6 +83,7 @@ This component offers various services to interact with your vehicle, including:
 
 - **start_engine / stop_engine**: This service allows you to remotely start or stop your vehicle's engine. It's an experimental feature not officially supported by the Lynk & Co app.
 Use with caution, as it may not always perform as expected. My observations are that the EV engine will be started and climate will be set to your latest configuration in the car.
+Based on discussions in #53 it seems that this command will not work without sufficient fuel in the tank.
 This has not been tested without sufficient EV battery.
 
 ### Entities
