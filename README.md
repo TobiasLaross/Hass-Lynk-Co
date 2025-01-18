@@ -1,5 +1,8 @@
 # Lynk & Co Home Assistant Custom Component
 
+## Note
+I will no longer be maintaining this repository, Lynk will soon break the integration but also remove the start_engine endpoint.
+
 ## Introduction
 This custom component allows Home Assistant users to integrate and control their Lynk & Co vehicles directly from Home Assistant.
 It provides the functionality for multiple users to control pre climate and sensor monitoring.
