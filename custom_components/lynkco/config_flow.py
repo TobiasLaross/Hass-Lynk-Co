@@ -62,7 +62,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_user(self, user_input=None):
         """Handle a flow initialized by the user."""
         errors = {}
-        session = async_get_clientsession(self.hass)
+        session = aiohttp.ClientSession(cookie_jar=jar)
+        self.context['session'] = session
 
         if user_input:
             email = user_input.get("email")
@@ -116,7 +117,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_two_factor(self, user_input=None):
         """Handle the second step for inputting the 2FA code."""
         errors = {}
-        session = async_get_clientsession(self.hass)
+        session = self.context.get('session')
 
         if user_input is not None:
             two_fa_code = user_input.get("2fa")
@@ -171,6 +172,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 )
                 errors["base"] = "two_factor_auth_failed"
 
+        # Close the session
+        await session.close()
+        
         # Show the form again with any errors
         return self.async_show_form(
             step_id="two_factor",
