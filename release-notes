@@ -1,3 +1,6 @@
+1.9.0
+Fixed issue with 2FA SMS codes not being sent during the configuration flow.
+Fixed issues #69
 1.8.0
 The integration should no longer setup a new device when re-authenticating and dark hours should work as expected. Also removed usage of deprecated functions.
 Fixed issues #38, #43 #47 and #51.
