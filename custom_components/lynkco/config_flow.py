@@ -62,6 +62,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_user(self, user_input=None):
         """Handle a flow initialized by the user."""
         errors = {}
+        
+        jar = aiohttp.CookieJar(quote_cookie=False)
         session = aiohttp.ClientSession(cookie_jar=jar)
         self.context['session'] = session
 
@@ -133,6 +135,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     login_details.get("code_verifier"),
                     session,
                 )
+                
+                # Close the session
+                await session.close()
 
                 if access_token and refresh_token:
                     token_storage = get_token_storage(self.hass)
@@ -171,9 +176,6 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     "Error during two-factor authentication: %s", e, exc_info=True
                 )
                 errors["base"] = "two_factor_auth_failed"
-
-        # Close the session
-        await session.close()
         
         # Show the form again with any errors
         return self.async_show_form(
