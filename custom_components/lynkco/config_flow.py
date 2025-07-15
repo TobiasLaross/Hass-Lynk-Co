@@ -4,7 +4,7 @@ import re
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.data_entry_flow import FlowResult
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
+import aiohttp
 
 from .const import (
     CONFIG_2FA_KEY,
@@ -62,7 +62,10 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_user(self, user_input=None):
         """Handle a flow initialized by the user."""
         errors = {}
-        session = async_get_clientsession(self.hass)
+        
+        jar = aiohttp.CookieJar(quote_cookie=False)
+        session = aiohttp.ClientSession(cookie_jar=jar)
+        self.context['session'] = session
 
         if user_input:
             email = user_input.get("email")
@@ -116,7 +119,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_two_factor(self, user_input=None):
         """Handle the second step for inputting the 2FA code."""
         errors = {}
-        session = async_get_clientsession(self.hass)
+        session = self.context.get('session')
 
         if user_input is not None:
             two_fa_code = user_input.get("2fa")
@@ -132,6 +135,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     login_details.get("code_verifier"),
                     session,
                 )
+                
+                # Close the session
+                await session.close()
 
                 if access_token and refresh_token:
                     token_storage = get_token_storage(self.hass)
@@ -170,7 +176,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     "Error during two-factor authentication: %s", e, exc_info=True
                 )
                 errors["base"] = "two_factor_auth_failed"
-
+        
         # Show the form again with any errors
         return self.async_show_form(
             step_id="two_factor",
