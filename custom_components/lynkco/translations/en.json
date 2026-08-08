@@ -6,7 +6,7 @@
       "unexpected_error": "An unexpected error occurred."
     },
     "error": {
-      "invalid_redirect_uri": "The provided redirect URI is invalid. Please check and try again.",
+      "invalid_redirect_uri": "No authorization code could be found in what you pasted. Paste the full msauth:// link or just the code value and try again.",
       "invalid_email": "The provided email is invalid. Please check and try again.",
       "invalid_2fa_code": "The provided 2FA code is invalid. Please check and try again.",
       "login_failed": "Login failed. Please check your credentials and try again."
@@ -14,12 +14,12 @@
     "step": {
       "user": {
         "menu_options": {
-          "direct_login": "Direct Login",
-          "redirect_login": "Redirect Login"
+          "redirect_login": "Browser Login (recommended)",
+          "direct_login": "Direct Login (legacy)"
         },
         "menu_option_descriptions": {
-          "direct_login": "Standard way, login with email and password. Try this first.",
-          "redirect_login": "If direct login fails, use this method which requires browser interaction."
+          "redirect_login": "Log in through your browser and paste back the authorization code. Use this method.",
+          "direct_login": "Enter email and password directly. Usually fails now that Lynk & Co requires a CAPTCHA – only try this if Browser Login does not work for you."
         }
       },
       "direct_login": {
@@ -38,10 +38,10 @@
         }
       },
       "redirect_login": {
-        "title": "Redirect Login",
-        "description": "Open the following URL in your browser to authorize. Once finished, grab and input the redirect uri in the field below: {auth_url}",
+        "title": "Browser Login",
+        "description": "1. Open this URL in a desktop browser and complete the login (password, CAPTCHA and any 2FA):\n\n{auth_url}\n\n2. After the final step the browser tries to open a link starting with `msauth://` and shows an error page – this is expected.\n3. Copy that `msauth://...` link. It is usually shown in the address bar; if not, open the developer tools (F12) → Network tab, find the request to `msauth://...` and copy its URL.\n4. Paste it below. You may paste the whole `msauth://...?code=...` link or just the `code` value on its own.",
         "data": {
-          "redirect_uri": "Redirect URI"
+          "redirect_uri": "Redirect link or authorization code"
         }
       },
       "reauth": {

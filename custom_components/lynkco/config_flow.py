@@ -24,6 +24,7 @@ from .const import (
     STORAGE_REFRESH_TOKEN_KEY,
 )
 from .login_flow import (
+    extract_auth_code,
     get_auth_uri,
     get_tokens_from_redirect_uri,
     get_user_vins,
@@ -63,11 +64,6 @@ def is_valid_email(email: str) -> bool:
     """Validate the email format using a regex pattern."""
     pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
     return bool(re.match(pattern, email))
-
-
-def is_valid_redirect_uri(redirect_uri: str) -> bool:
-    """Basic validation for redirect URI format."""
-    return redirect_uri.startswith("msauth://prod.lynkco.app.crisp.prod/")
 
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -135,7 +131,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         return self.async_show_menu(
             step_id="user",
-            menu_options=[CONFIG_LOGIN_METHOD_DIRECT, CONFIG_LOGIN_METHOD_REDIRECT],
+            menu_options=[CONFIG_LOGIN_METHOD_REDIRECT, CONFIG_LOGIN_METHOD_DIRECT],
         )
 
     async def async_step_redirect_login(self, user_input=None):
@@ -147,7 +143,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             login_code_verifier = self._login_code_verifier
 
             if redirect_uri and login_code_verifier:
-                if not is_valid_redirect_uri(redirect_uri):
+                if extract_auth_code(redirect_uri) is None:
                     errors["redirect_uri"] = "invalid_redirect_uri"
                 else:
                     async with aiohttp.ClientSession() as session:
