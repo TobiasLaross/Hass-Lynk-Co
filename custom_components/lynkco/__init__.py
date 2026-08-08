@@ -18,7 +18,6 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 from .const import (
     CONFIG_DARK_HOURS_END,
     CONFIG_DARK_HOURS_START,
-    CONFIG_EXPERIMENTAL_KEY,
     CONFIG_SCAN_INTERVAL_KEY,
     CONFIG_VIN_KEY,
     COORDINATOR,
@@ -97,7 +96,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         DATA_EXPECTED_STATE: expected_state_monitor,
     }
 
-    _LOGGER.debug(f"Experimental: {entry.options.get(CONFIG_EXPERIMENTAL_KEY, False)}")
     await setup_data_coordinator(hass, entry)
 
     entry.async_on_unload(entry.add_update_listener(options_update_listener))
@@ -121,13 +119,11 @@ async def options_update_listener(hass: HomeAssistant, entry: ConfigEntry):
 
 
 async def register_services(hass: HomeAssistant, entry: ConfigEntry):
-    """Register or unregister services based on the experimental option."""
+    """Register the integration's services."""
     vin = hass.data[DOMAIN][entry.entry_id][CONFIG_VIN_KEY]
     expected_state_monitor: ExpectedStateMonitor = hass.data[DOMAIN][entry.entry_id][
         DATA_EXPECTED_STATE
     ]
-    experimental = entry.options.get(CONFIG_EXPERIMENTAL_KEY, False)
-    _LOGGER.info(f"Register services using experimental: {experimental}")
 
     # Define async wrappers for your coroutine service calls
     async def refresh_tokens_service(call):
@@ -211,29 +207,8 @@ async def register_services(hass: HomeAssistant, entry: ConfigEntry):
     hass.services.async_register(
         DOMAIN, SERVICE_FORCE_UPDATE_KEY, force_update_data_service
     )
-
-    # Experimental services
-    if experimental:
-        hass.services.async_register(
-            DOMAIN, SERVICE_START_ENGINE_KEY, start_engine_service
-        )
-        hass.services.async_register(
-            DOMAIN, SERVICE_STOP_ENGINE_KEY, stop_engine_service
-        )
-    else:
-        await safely_remove_service(hass, DOMAIN, SERVICE_START_ENGINE_KEY)
-        await safely_remove_service(hass, DOMAIN, SERVICE_STOP_ENGINE_KEY)
-
-
-def service_is_registered(hass: HomeAssistant, domain: str, service: str) -> bool:
-    """Check if a service is already registered."""
-    return service in hass.services.async_services().get(domain, {})
-
-
-async def safely_remove_service(hass: HomeAssistant, domain: str, service: str):
-    """Safely remove a service if it's registered."""
-    if service_is_registered(hass, domain, service):
-        hass.services.async_remove(domain, service)
+    hass.services.async_register(DOMAIN, SERVICE_START_ENGINE_KEY, start_engine_service)
+    hass.services.async_register(DOMAIN, SERVICE_STOP_ENGINE_KEY, stop_engine_service)
 
 
 async def setup_data_coordinator(hass: HomeAssistant, entry: ConfigEntry):

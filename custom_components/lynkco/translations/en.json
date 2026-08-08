@@ -56,7 +56,6 @@
         "data": {
           "dark_hours_end": "End of dark hours interval (not automatic updates during interval)",
           "dark_hours_start": "Start of dark hours interval (not automatic updates during interval)",
-          "experimental": "Enable experimental features (use at your own risk)",
           "scan_interval": "Scan Interval (minutes)"
         },
         "description": "Configure your Lynk & Co integration settings.",

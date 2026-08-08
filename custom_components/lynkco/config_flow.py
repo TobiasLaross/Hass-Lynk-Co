@@ -13,7 +13,6 @@ from .const import (
     CONFIG_DARK_HOURS_END,
     CONFIG_DARK_HOURS_START,
     CONFIG_EMAIL_KEY,
-    CONFIG_EXPERIMENTAL_KEY,
     CONFIG_LOGIN_METHOD_DIRECT,
     CONFIG_LOGIN_METHOD_REDIRECT,
     CONFIG_PASSWORD_KEY,
@@ -122,7 +121,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             title="Lynk & Co",
             data={CONFIG_VIN_KEY: vin},
             description_placeholders={
-                "additional_configuration": "Please use the configuration to enable experimental features."
+                "additional_configuration": "You can adjust the update interval and other options from the integration's configuration."
             },
         )
 
@@ -282,12 +281,6 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
         data_schema = vol.Schema(
             {
-                vol.Required(
-                    CONFIG_EXPERIMENTAL_KEY,
-                    default=self.config_entry.options.get(
-                        CONFIG_EXPERIMENTAL_KEY, False
-                    ),
-                ): bool,
                 vol.Required(
                     CONFIG_SCAN_INTERVAL_KEY,
                     default=self.config_entry.options.get(
