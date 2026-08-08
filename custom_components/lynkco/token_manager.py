@@ -1,12 +1,12 @@
+import asyncio
 import base64
 import json
 import logging
 import os
 import time
+import uuid
 
 import aiohttp
-from homeassistant.auth.models import uuid
-from homeassistant.config_entries import asyncio
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.storage import Store
 

@@ -1,8 +1,7 @@
 import logging
 
-from homeassistant.components.device_tracker import SourceType
-from homeassistant.components.device_tracker.config_entry import TrackerEntity
-from homeassistant.helpers.entity import DeviceInfo
+from homeassistant.components.device_tracker import SourceType, TrackerEntity  # pyright: ignore[reportPrivateImportUsage]
+from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import COORDINATOR, DOMAIN
@@ -26,7 +25,9 @@ class LynkCoDeviceTracker(CoordinatorEntity, TrackerEntity):
         self._attr_unique_id = f"{DOMAIN}_{self._vin}_location"
         self._attr_name = "Lynk & Co Vehicle Tracker"
 
-        self._attr_device_info = DeviceInfo(
+        # BaseTrackerEntity narrows _attr_device_info to None, but core integrations
+        # (ituran, volvo, ...) attach their trackers to a device the same way.
+        self._attr_device_info = DeviceInfo(  # pyright: ignore[reportAttributeAccessIssue]
             identifiers={(DOMAIN, f"lynk_co_{self._vin}")},
             manufacturer="Lynk & Co",
             name=f"Lynk & Co {self._vin}",
