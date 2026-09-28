@@ -99,15 +99,45 @@ def get_auth_uri() -> tuple[str, str, str]:
     return auth_url, code_verifier, code_challenge
 
 
+def extract_auth_code(value: str) -> str | None:
+    """Extract the OAuth authorization code from a value pasted by the user.
+
+    The login redirect dead-ends on the ``msauth://`` custom scheme, so the
+    user has to grab the code by hand. Be forgiving about what they paste:
+    accept the full ``msauth://...?code=...`` redirect URL, any other URL that
+    carries a ``code`` query (or fragment) parameter, or the bare code itself.
+    """
+
+    if value is None:
+        return None
+    value = value.strip()
+    if not value:
+        return None
+
+    # Looks like a URL: pull the code out of the query string or fragment.
+    if "://" in value or "?" in value or "#" in value:
+        parsed = urllib.parse.urlparse(value)
+        for part in (parsed.query, parsed.fragment):
+            code = urllib.parse.parse_qs(part).get("code", [None])[0]
+            if code:
+                return code
+        return None
+
+    # Otherwise assume the user pasted just the code.
+    return value
+
+
 async def get_tokens_from_redirect_uri(
     uri: str,
     code_verifier: str,
     session: aiohttp.ClientSession,
 ) -> tuple[str | None, str | None, str | None]:
-    """Extract access and refresh tokens from a redirect URI."""
+    """Extract access and refresh tokens from a redirect URI or bare code."""
 
-    parsed_url = urllib.parse.urlparse(uri)
-    code = urllib.parse.parse_qs(parsed_url.query).get("code", [None])[0]
+    code = extract_auth_code(uri)
+    if code is None:
+        _LOGGER.error("No authorization code found in the provided value")
+        return None, None, None
 
     access_token, refresh_token, id_token = await getTokens(
         code,

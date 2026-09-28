@@ -6,7 +6,7 @@ I will no longer be maintaining this repository, Lynk will soon break the integr
 ## Introduction
 This custom component allows Home Assistant users to integrate and control their Lynk & Co vehicles directly from Home Assistant.
 It provides the functionality for multiple users to control pre climate and sensor monitoring.
-An experimental service to start and stop the engine is included as well as lock and unlock doors, and monitor various vehicle
+A service to start and stop the engine is included as well as lock and unlock doors, and monitor various vehicle
 statuses like battery level, fuel level, and climate control status, enhancing the smart home experience with vehicle management.
 This has been tested on european models only.
 
@@ -61,8 +61,7 @@ Options can be configured through the Options Flow in the Home Assistant UI:
 
 1. Navigate to Configuration > Integrations.
 2. Find the Lynk & Co integration and click "Configure".
-3. Adjust settings such as scan interval and experimental features:
-   - Enable or disable experimental features.
+3. Adjust settings such as scan interval and dark hours:
    - Configure the scan interval (in minutes) to control how frequently your vehicle's data is updated.
    - Set the start and end times for "dark hours" to limit automatic data updates during certain hours.
 
@@ -78,13 +77,13 @@ This component offers various services to interact with your vehicle, including:
 - `start_flash_lights` / `stop_flash_lights`: Activates or deactivates hazard lights.
 - `start_honk` / `stop_honk`: Activates or deactivates honk.
 - `start_honk_flash`: Activates honk and hazard lights.
-- `start_engine` / `stop_engine`: Starts or stops the engine. (Note: This feature is experimental and is not documented by Lynk & Co.)
+- `start_engine` / `stop_engine`: Starts or stops the engine. (Note: This is not an officially documented Lynk & Co feature.)
 - `force_update_data`: Forcing update data from the vehicle, bypassing night limit.
 - `refresh_tokens`: Refreshes authentication tokens, this should not be needed, handled automatically.
 
 #### Detailed Service Information
 
-- **start_engine / stop_engine**: This service allows you to remotely start or stop your vehicle's engine. It's an experimental feature not officially supported by the Lynk & Co app.
+- **start_engine / stop_engine**: This service allows you to remotely start or stop your vehicle's engine. It's not officially supported by the Lynk & Co app.
 Use with caution, as it may not always perform as expected. My observations are that the EV engine will be started and climate will be set to your latest configuration in the car.
 Based on discussions in #53 it seems that this command will not work without sufficient fuel in the tank.
 This has not been tested without sufficient EV battery.

@@ -1,0 +1,7 @@
+{
+    // Home Assistant's Entity base classes define name/state/available/... as
+    // propcache.cached_property, while integrations are expected to override them
+    // with a plain @property. Core does this everywhere, so the mismatch that
+    // Pylance reports is noise rather than a real problem.
+    "reportIncompatibleVariableOverride": "none"
+}

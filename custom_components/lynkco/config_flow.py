@@ -7,14 +7,12 @@ import aiohttp
 import voluptuous as vol
 
 from homeassistant import config_entries
-from homeassistant.data_entry_flow import FlowResult
 
 from .const import (
     CONFIG_2FA_KEY,
     CONFIG_DARK_HOURS_END,
     CONFIG_DARK_HOURS_START,
     CONFIG_EMAIL_KEY,
-    CONFIG_EXPERIMENTAL_KEY,
     CONFIG_LOGIN_METHOD_DIRECT,
     CONFIG_LOGIN_METHOD_REDIRECT,
     CONFIG_PASSWORD_KEY,
@@ -25,6 +23,7 @@ from .const import (
     STORAGE_REFRESH_TOKEN_KEY,
 )
 from .login_flow import (
+    extract_auth_code,
     get_auth_uri,
     get_tokens_from_redirect_uri,
     get_user_vins,
@@ -66,15 +65,17 @@ def is_valid_email(email: str) -> bool:
     return bool(re.match(pattern, email))
 
 
-def is_valid_redirect_uri(redirect_uri: str) -> bool:
-    """Basic validation for redirect URI format."""
-    return redirect_uri.startswith("msauth://prod.lynkco.app.crisp.prod/")
-
-
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Lynk & Co."""
 
     VERSION = 1
+
+    def __init__(self) -> None:
+        """Initialize the flow state."""
+        self._reauth_entry: config_entries.ConfigEntry | None = None
+        self._login_code_verifier: str | None = None
+        self._session: aiohttp.ClientSession | None = None
+        self._login_details: dict[str, str | None] = {}
 
     @staticmethod
     def async_get_options_flow(config_entry):
@@ -106,7 +107,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             _LOGGER.error("No VINs found for the user")
             return self.async_abort(reason="no_vins_found")
 
-        if hasattr(self, "_reauth_entry"):
+        if self._reauth_entry is not None:
             # Update the existing config entry
             self.hass.config_entries.async_update_entry(
                 self._reauth_entry,
@@ -120,7 +121,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             title="Lynk & Co",
             data={CONFIG_VIN_KEY: vin},
             description_placeholders={
-                "additional_configuration": "Please use the configuration to enable experimental features."
+                "additional_configuration": "You can adjust the update interval and other options from the integration's configuration."
             },
         )
 
@@ -129,7 +130,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         return self.async_show_menu(
             step_id="user",
-            menu_options=[CONFIG_LOGIN_METHOD_DIRECT, CONFIG_LOGIN_METHOD_REDIRECT],
+            menu_options=[CONFIG_LOGIN_METHOD_REDIRECT, CONFIG_LOGIN_METHOD_DIRECT],
         )
 
     async def async_step_redirect_login(self, user_input=None):
@@ -138,10 +139,10 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         if user_input:
             redirect_uri = user_input.get(CONFIG_REDIRECT_URI_KEY)
-            login_code_verifier = self.context.get("login_code_verifier")
+            login_code_verifier = self._login_code_verifier
 
             if redirect_uri and login_code_verifier:
-                if not is_valid_redirect_uri(redirect_uri):
+                if extract_auth_code(redirect_uri) is None:
                     errors["redirect_uri"] = "invalid_redirect_uri"
                 else:
                     async with aiohttp.ClientSession() as session:
@@ -162,7 +163,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 errors["missing_details"] = "missing_details"
 
         auth_url, code_verifier, _ = get_auth_uri()
-        self.context["login_code_verifier"] = code_verifier
+        self._login_code_verifier = code_verifier
 
         return self.async_show_form(
             step_id="redirect_login",
@@ -175,9 +176,10 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         """Handle a flow initialized by the user."""
         errors = {}
 
-        jar = aiohttp.CookieJar(quote_cookie=False)
-        session = aiohttp.ClientSession(cookie_jar=jar)
-        self.context["session"] = session
+        if self._session is None or self._session.closed:
+            jar = aiohttp.CookieJar(quote_cookie=False)
+            self._session = aiohttp.ClientSession(cookie_jar=jar)
+        session = self._session
 
         if user_input:
             email = user_input.get("email")
@@ -198,7 +200,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 ) = await login(email, password, session)
 
                 if None not in (x_ms_cpim_trans_value, x_ms_cpim_csrf_token):
-                    self.context["login_details"] = {
+                    self._login_details = {
                         "x_ms_cpim_trans_value": x_ms_cpim_trans_value,
                         "x_ms_cpim_csrf_token": x_ms_cpim_csrf_token,
                         "page_view_id": page_view_id,
@@ -224,11 +226,11 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_direct_login_2fa(self, user_input=None):
         """Handle the second step for inputting the 2FA code."""
         errors = {}
-        session = self.context.get("session")
+        session = self._session
 
-        if user_input is not None:
+        if user_input is not None and session is not None:
             two_fa_code = user_input.get("2fa")
-            login_details = self.context.get("login_details", {})
+            login_details = self._login_details
 
             try:
                 access_token, refresh_token, id_token = await two_factor_authentication(
@@ -241,10 +243,10 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     session,
                 )
 
-                # Close the session
-                await session.close()
-
                 if access_token and refresh_token and id_token:
+                    # Close the session, the login is complete
+                    await session.close()
+                    self._session = None
                     return await self._finalize_with_tokens(
                         access_token, refresh_token, id_token
                     )
@@ -264,27 +266,21 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_reauth(self, user_input=None):
         """Handle the re-authentication flow."""
-        self._reauth_entry = self.hass.config_entries.async_get_entry(
-            self.context["entry_id"]
-        )
+        entry_id = self.context.get("entry_id")
+        if entry_id is not None:
+            self._reauth_entry = self.hass.config_entries.async_get_entry(entry_id)
 
         return await self.async_step_user(user_input)
 
 
 class OptionsFlowHandler(config_entries.OptionsFlow):
-    async def async_step_init(self, user_input=None) -> FlowResult:
+    async def async_step_init(self, user_input=None) -> config_entries.ConfigFlowResult:
         if user_input is not None:
             # Save the options and conclude the options flow
             return self.async_create_entry(title="", data=user_input)
 
         data_schema = vol.Schema(
             {
-                vol.Required(
-                    CONFIG_EXPERIMENTAL_KEY,
-                    default=self.config_entry.options.get(
-                        CONFIG_EXPERIMENTAL_KEY, False
-                    ),
-                ): bool,
                 vol.Required(
                     CONFIG_SCAN_INTERVAL_KEY,
                     default=self.config_entry.options.get(
