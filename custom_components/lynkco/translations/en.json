@@ -1,52 +1,68 @@
 {
-  "title": "Lynk & Co",
   "config": {
+    "abort": {
+      "already_configured": "This device is already configured.",
+      "reauth_failed": "Re-authentication failed. Please try again.",
+      "unexpected_error": "An unexpected error occurred."
+    },
+    "error": {
+      "invalid_redirect_uri": "The provided redirect URI is invalid. Please check and try again.",
+      "invalid_email": "The provided email is invalid. Please check and try again.",
+      "invalid_2fa_code": "The provided 2FA code is invalid. Please check and try again.",
+      "login_failed": "Login failed. Please check your credentials and try again."
+    },
     "step": {
       "user": {
-        "title": "Configure Lynk & Co Integration",
+        "menu_options": {
+          "direct_login": "Direct Login",
+          "redirect_login": "Redirect Login"
+        },
+        "menu_option_descriptions": {
+          "direct_login": "Standard way, login with email and password. Try this first.",
+          "redirect_login": "If direct login fails, use this method which requires browser interaction."
+        }
+      },
+      "direct_login": {
+        "title": "Direct Login",
         "description": "Please enter your credentials.",
         "data": {
           "email": "Email Address",
-          "password": "Password",
-          "vin": "Vehicle Identification Number (VIN)"
+          "password": "Password"
         }
       },
-      "two_factor": {
+      "direct_login_2fa": {
         "title": "2FA Verification",
         "description": "Enter the 2FA code.",
         "data": {
           "2fa": "Two-Factor Authentication Code"
         }
       },
+      "redirect_login": {
+        "title": "Redirect Login",
+        "description": "Open the following URL in your browser to authorize. Once finished, grab and input the redirect uri in the field below: {auth_url}",
+        "data": {
+          "redirect_uri": "Redirect URI"
+        }
+      },
       "reauth": {
         "title": "Re-authentication Required",
         "description": "Please re-enter your credentials to re-authenticate."
       }
-    },
-    "error": {
-      "invalid_email": "The provided email is invalid. Please check and try again.",
-      "invalid_vin": "The provided VIN is invalid. Please check and try again.",
-      "invalid_2fa_code": "The provided 2FA code is invalid. Please check and try again.",
-      "login_failed": "Login failed. Please check your credentials and try again."
-    },
-    "abort": {
-      "unexpected_error": "An unexpected error occurred.",
-      "already_configured": "This device is already configured.",
-      "reauth_failed": "Re-authentication failed. Please try again."
     }
   },
   "options": {
     "step": {
       "init": {
-        "title": "Lynk & Co Integration Settings",
-        "description": "Configure your Lynk & Co integration settings.",
         "data": {
-          "experimental": "Enable experimental features (use at your own risk)",
-          "scan_interval": "Scan Interval (minutes)",
+          "dark_hours_end": "End of dark hours interval (not automatic updates during interval)",
           "dark_hours_start": "Start of dark hours interval (not automatic updates during interval)",
-          "dark_hours_end": "End of dark hours interval (not automatic updates during interval)"
-        }
+          "experimental": "Enable experimental features (use at your own risk)",
+          "scan_interval": "Scan Interval (minutes)"
+        },
+        "description": "Configure your Lynk & Co integration settings.",
+        "title": "Lynk & Co Integration Settings"
       }
     }
-  }
+  },
+  "title": "Lynk & Co"
 }
