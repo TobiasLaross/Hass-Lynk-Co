@@ -1,3 +1,5 @@
+"""Constants for the Lynk & Co integration."""
+
 DOMAIN = "lynkco"
 COORDINATOR = "coordinator"
 STORAGE_VERSION = 1
@@ -8,10 +10,14 @@ STORAGE_REFRESH_TOKEN_KEY = "refresh_token"
 DATA_UPDATE_COORDINATOR = "data_update_coordinator"
 
 # Config keys
-CONFIG_VIN_KEY = "vin"
+CONFIG_LOGIN_METHOD = "login_method"
+CONFIG_LOGIN_METHOD_DIRECT = "direct_login"
+CONFIG_LOGIN_METHOD_REDIRECT = "redirect_login"
 CONFIG_EMAIL_KEY = "email"
 CONFIG_PASSWORD_KEY = "password"
+CONFIG_VIN_KEY = "vin"
 CONFIG_2FA_KEY = "2fa"
+CONFIG_REDIRECT_URI_KEY = "redirect_uri"
 CONFIG_EXPERIMENTAL_KEY = "experimental"
 CONFIG_SCAN_INTERVAL_KEY = "scan_interval"
 CONFIG_DARK_HOURS_START = "dark_hours_start"

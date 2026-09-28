@@ -3,19 +3,35 @@
   "config": {
     "step": {
       "user": {
-        "title": "Configure Lynk & Co Integration",
+        "menu_options": {
+          "direct_login": "Direct Login",
+          "redirect_login": "Redirect Login"
+        },
+        "menu_option_descriptions": {
+          "direct_login": "Standard way, login with email, password and VIN. Try this first.",
+          "redirect_login": "If direct login fails, use this method which requires browser interaction."
+        }
+      },
+      "direct_login": {
+        "title": "Direct Login",
         "description": "Please enter your credentials.",
         "data": {
           "email": "Email Address",
-          "password": "Password",
-          "vin": "Vehicle Identification Number (VIN)"
+          "password": "Password"
         }
       },
-      "two_factor": {
+      "direct_login_2fa": {
         "title": "2FA Verification",
         "description": "Enter the 2FA code.",
         "data": {
           "2fa": "Two-Factor Authentication Code"
+        }
+      },
+      "redirect_login": {
+        "title": "Redirect Login",
+        "description": "Open the following URL in your browser to authorize. Once finished, grab and input the redirect uri in the field below: {auth_url}",
+        "data": {
+          "redirect_uri": "Redirect URI"
         }
       },
       "reauth": {
@@ -24,8 +40,8 @@
       }
     },
     "error": {
+      "invalid_redirect_uri": "The provided redirect URI is invalid. Please check and try again.",
       "invalid_email": "The provided email is invalid. Please check and try again.",
-      "invalid_vin": "The provided VIN is invalid. Please check and try again.",
       "invalid_2fa_code": "The provided 2FA code is invalid. Please check and try again.",
       "login_failed": "Login failed. Please check your credentials and try again."
     },

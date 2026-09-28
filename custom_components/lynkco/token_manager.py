@@ -25,7 +25,7 @@ ccc_token_lock = asyncio.Lock()
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))
 
 
-async def decode_jwt_token(token):
+def decode_jwt_token(token):
     """Decode JWT token without signature verification."""
     payload = token.split(".")[1]
     payload += "=" * (-len(payload) % 4)
@@ -36,7 +36,7 @@ async def decode_jwt_token(token):
 
 async def is_token_expired(token):
     """Check if the JWT token is expired."""
-    decoded_token = await decode_jwt_token(token)
+    decoded_token = decode_jwt_token(token)
     current_time = time.time()
     return decoded_token["exp"] < current_time
 
@@ -134,21 +134,20 @@ async def send_device_login(access_token: str):
         "api-version": "1",
     }
     data = {"deviceUuid": str(uuid.uuid4()), "isLogin": True}
-    async with aiohttp.ClientSession(
-        connector=aiohttp.TCPConnector(ssl=False)
-    ) as session:
-        async with session.post(
+    async with (
+        aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False)) as session,
+        session.post(
             "https://iam-service-prod.westeurope.cloudapp.azure.com/validate-session",
             headers=headers,
             json=data,
-        ) as response:
-            if response.status == 200:
-                ccc_token = (await response.json())["cccToken"]
-                return ccc_token
-            else:
-                _LOGGER.error(
-                    f"Failed to send device login, status: {response.status}, response: {await response.text()}"
-                )
+        ) as response,
+    ):
+        if response.status == 200:
+            data = await response.json()
+            return data["cccToken"]
+        _LOGGER.error(
+            f"Failed to send device login, status: {response.status}, response: {await response.text()}"
+        )
     return None
 
 
@@ -163,24 +162,24 @@ async def get_user_id(hass, ccc_token, vin):
         "content-type": "application/json",
         "Authorization": f"Bearer {ccc_token}",
     }
-    async with aiohttp.ClientSession(
-        connector=aiohttp.TCPConnector(ssl=False)
-    ) as session:
-        async with session.get(
+    async with (
+        aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False)) as session,
+        session.get(
             f"https://delegated-driver-tls.aion.connectedcar.cloud/delegated-driver/api/delegateddriver/v1/vehicle/{vin}/drivers",
             headers=headers,
-        ) as response:
-            if response.status == 200:
-                response_json = await response.json()
-                if response_json["drivers"]:
-                    user_id = response_json["drivers"][0]["userId"]
-                    tokens[STORAGE_USER_ID_KEY] = user_id
-                    await token_storage.async_save(tokens)
-                    return user_id
-                else:
-                    _LOGGER.error("No drivers found in response")
+        ) as response,
+    ):
+        if response.status == 200:
+            response_json = await response.json()
+            if response_json["drivers"]:
+                user_id = response_json["drivers"][0]["userId"]
+                tokens[STORAGE_USER_ID_KEY] = user_id
+                await token_storage.async_save(tokens)
+                return user_id
             else:
-                _LOGGER.error(
-                    f"Failed to get user id, status: {response.status}, response: {await response.text()}"
-                )
+                _LOGGER.error("No drivers found in response")
+        else:
+            _LOGGER.error(
+                f"Failed to get user id, status: {response.status}, response: {await response.text()}"
+            )
     return None
