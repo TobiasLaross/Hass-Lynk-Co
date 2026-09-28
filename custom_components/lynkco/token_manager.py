@@ -118,8 +118,19 @@ async def refresh_tokens(hass):
                     ccc_token = None
                 await token_storage.async_save(stored_tokens)
                 return ccc_token
+            elif response.status in (400, 401):
+                # B2C refresh tokens hard-expire ~90 days after login and can't be
+                # renewed; surface a reauth repair instead of silently serving stale data.
+                _LOGGER.error(
+                    "Refresh token rejected, status: %s, response: %s",
+                    response.status,
+                    await response.text(),
+                )
+                raise ConfigEntryAuthFailed("Token has expired, please re-authenticate.")
             else:
-                _LOGGER.error("Failed to get new refresh token")
+                _LOGGER.error(
+                    "Failed to get new refresh token, status: %s", response.status
+                )
     return None
 
 
