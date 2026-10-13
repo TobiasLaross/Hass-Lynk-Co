@@ -9,6 +9,7 @@ def create_sensors(coordinator, vin):
             "Lynk & Co Interior Temperature",
             "vehicle_record.climate.interiorTemp.temp",
             "°C",
+            quality_path="vehicle_record.climate.interiorTemp.Quality",
         ),
         LynkCoSensor(
             coordinator,
@@ -34,6 +35,7 @@ def create_sensors(coordinator, vin):
             "Lynk & Co Exterior temperature",
             "vehicle_record.climate.exteriorTemp.temp",
             "°C",
+            quality_path="vehicle_record.climate.exteriorTemp.Quality",
         ),
         LynkCoSensor(
             coordinator,

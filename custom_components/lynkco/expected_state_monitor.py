@@ -18,30 +18,49 @@ from .const import (
 
 _LOGGER = logging.getLogger(__name__)
 
+LOCKED_STATES = ("DOOR_LOCKS_STATUS_LOCKED", "DOOR_LOCKS_STATUS_SAFE_LOCKED")
+
+
+def get_data_value(data, data_path):
+    """Read a dotted path from the coordinator data, or None if it is missing."""
+    for key in data_path.split("."):
+        if not isinstance(data, dict):
+            return None
+        data = data.get(key)
+    return data
+
 
 class ExpectedStateMonitor:
     def __init__(self):
         self.expected_states = {}
         self.loop_running = False
         self.lock = asyncio.Lock()
+        # Each expected state maps to the coordinator data path the matching
+        # entity reads, and a check of that raw value.
         self.state_map = {
             EXPECTED_STATE_ENGINE_ON: (
-                "binary_sensor.lynk_co_vehicle_is_running",
-                "on",
+                "vehicle_shadow.bvs.engineStatus",
+                lambda value: value == "ENGINE_RUNNING",
             ),
             EXPECTED_STATE_ENGINE_OFF: (
-                "binary_sensor.lynk_co_vehicle_is_running",
-                "off",
+                "vehicle_shadow.bvs.engineStatus",
+                lambda value: value == "ENGINE_OFF",
             ),
-            EXPECTED_STATE_UNLOCKED: ("lock.lynk_co_locks", "unlocked"),
-            EXPECTED_STATE_LOCKED: ("lock.lynk_co_locks", "locked"),
+            EXPECTED_STATE_UNLOCKED: (
+                "vehicle_shadow.vls.doorLocksStatus",
+                lambda value: value is not None and value not in LOCKED_STATES,
+            ),
+            EXPECTED_STATE_LOCKED: (
+                "vehicle_shadow.vls.doorLocksStatus",
+                lambda value: value in LOCKED_STATES,
+            ),
             EXPECTED_STATE_CLIMATE_ON: (
-                "binary_sensor.lynk_co_pre_climate_active",
-                "on",
+                "vehicle_record.climate.preClimateActive",
+                lambda value: bool(value),
             ),
             EXPECTED_STATE_CLIMATE_OFF: (
-                "binary_sensor.lynk_co_pre_climate_active",
-                "off",
+                "vehicle_record.climate.preClimateActive",
+                lambda value: not value,
             ),
         }
 
@@ -92,9 +111,8 @@ class ExpectedStateMonitor:
         to_remove = []
         now = datetime.now()
         for state, timestamp in self.expected_states.items():
-            entity_id, expected_value = self.state_map[state]
-            actual_value = current_states.get(entity_id)
-            if actual_value == expected_value:
+            data_path, is_reached = self.state_map[state]
+            if is_reached(get_data_value(current_states, data_path)):
                 _LOGGER.info(f"State {state} reached the expected value.")
                 to_remove.append(state)
             elif (now - timestamp) > timedelta(minutes=3):

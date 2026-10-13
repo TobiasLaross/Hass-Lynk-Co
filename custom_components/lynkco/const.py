@@ -49,3 +49,7 @@ EXPECTED_STATE_ENGINE_ON = "engine_on"
 EXPECTED_STATE_ENGINE_OFF = "engine_off"
 EXPECTED_STATE_UNLOCKED = "unlocked"
 EXPECTED_STATE_LOCKED = "locked"
+
+# The car reports a placeholder value (e.g. 0 °C interior temperature while
+# pre-climate is running) together with this quality flag when it has no reading.
+INVALID_DATA_QUALITY = {"UNDEFINED_DATA_ACCURACY"}

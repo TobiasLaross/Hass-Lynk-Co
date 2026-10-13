@@ -4,7 +4,13 @@ from homeassistant.components.lock import LockEntity
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import COORDINATOR, DOMAIN
+from .const import (
+    COORDINATOR,
+    DATA_EXPECTED_STATE,
+    DOMAIN,
+    EXPECTED_STATE_LOCKED,
+    EXPECTED_STATE_UNLOCKED,
+)
 from .remote_control_manager import lock_doors, unlock_doors
 
 _LOGGER = logging.getLogger(__name__)
@@ -17,6 +23,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
         [
             LynkCoLock(
                 hass,
+                entry,
                 coordinator,
                 vin,
                 "Lynk & Co Locks",
@@ -27,10 +34,13 @@ async def async_setup_entry(hass, entry, async_add_entities):
 
 
 class LynkCoLock(CoordinatorEntity, LockEntity):
-    def __init__(self, hass, coordinator, vin, name, data_path, car_updated_at=None):
+    def __init__(
+        self, hass, entry, coordinator, vin, name, data_path, car_updated_at=None
+    ):
         super().__init__(coordinator)
         self._data_path = data_path.split(".")
         self._hass = hass
+        self._entry = entry
         self._vin = vin
         self._name = name
         self._state = None
@@ -63,11 +73,18 @@ class LynkCoLock(CoordinatorEntity, LockEntity):
 
     async def async_lock(self, **kwargs):
         """Lock the vehicle."""
+        await self._expect_state(EXPECTED_STATE_LOCKED)
         await lock_doors(self._hass, self._vin)
 
     async def async_unlock(self, **kwargs):
         """Unlock the vehicle."""
+        await self._expect_state(EXPECTED_STATE_UNLOCKED)
         await unlock_doors(self._hass, self._vin)
+
+    async def _expect_state(self, state):
+        """Poll the car until it reports the new lock state, like the lock_doors service."""
+        monitor = self._hass.data[DOMAIN][self._entry.entry_id][DATA_EXPECTED_STATE]
+        await monitor.expect_state(state, self._hass, self._entry)
 
     @property
     def available(self):
